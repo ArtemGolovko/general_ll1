@@ -43,17 +43,13 @@ void init_lexer(lexer_t *lexer, FILE *source) {
     lexer->nl = 0;
     lexer->row = 1;
 }
+
 void lexer_skip_mulitline_comment(lexer_t *lexer) {
     char c;
     bool is_prev_star = false;
 
     while (!feof(lexer->source)) {
         c = fgetc(lexer->source);
-
-        if (c == '*') {
-            is_prev_star = true;
-            continue;
-        }
 
         if (c == '\n') {
             lexer->nl = ftell(lexer->source);
@@ -65,7 +61,7 @@ void lexer_skip_mulitline_comment(lexer_t *lexer) {
             return;
         }
 
-        is_prev_star = false;
+        is_prev_star = c == '*';
     }
 }
 
@@ -91,7 +87,7 @@ void lexer_skip_whitespace_and_comments(lexer_t *lexer) {
             continue;
         }
 
-        if (isspace(c)) {
+        if (isspace(c) || c == -1) {
             continue;
         }
 
@@ -123,7 +119,7 @@ token_t lexer_read_Id(lexer_t *lexer) {
     size_t buffer_length = 14;
     size_t buffer_usage = 0;
 
-    while (!feof(lexer->source)) {
+    while (!feof(lexer->source) && c != -1) {
         c = fgetc(lexer->source);
         if (isalpha(c) || c == '_') {
             if (buffer_usage + 1 >= buffer_length) {
@@ -162,6 +158,48 @@ token_t lexer_read_Id(lexer_t *lexer) {
 
     free(buffer);
 
+    return token;
+}
+
+token_t lexer_read_Terminal(lexer_t *lexer) {
+    char c;
+    bool is_prev_backslash = false;
+    char *buffer = (char *)malloc(15 * sizeof(char));
+    size_t buffer_length = 14;
+    size_t buffer_usage = 0;
+
+    while (!feof(lexer->source) && c != -1) {
+        c = fgetc(lexer->source);
+
+        if (!is_prev_backslash && c == '"') {
+            token_t token;
+
+            init_token(&token, lexer, Terminal, buffer_usage);
+            token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
+
+            buffer[buffer_usage] = '\0';
+            strcpy_s(token.value, buffer_usage + 1, buffer);
+
+            free(buffer);
+
+            return token;
+        }
+        
+        is_prev_backslash = c == '\\';
+
+        if (buffer_usage + 1 >= buffer_length) {
+            buffer_length += 15;
+            buffer = realloc(buffer, buffer_length * sizeof(char));
+        }
+
+        buffer[buffer_usage] = c;
+        buffer_usage += 1;
+    }
+    
+    free(buffer);
+
+    token_t token;
+    init_token(&token, lexer, Invalid, buffer_usage + 1);
     return token;
 }
 
@@ -218,6 +256,11 @@ token_t lexer_next_token(lexer_t *lexer) {
         return token;
     }
 
+    if (c == '"') {
+        token = lexer_read_Terminal(lexer);
+        return token;
+    }
+
     init_token(&token, lexer,  Invalid, 1);
     return token;
 }
@@ -226,10 +269,20 @@ void parse(FILE *source) {
     lexer_t lexer;
     init_lexer(&lexer, source);
 
-    token_t token = lexer_next_token(&lexer);
+    token_t token;
+    while (true) {
+        token = lexer_next_token(&lexer);
 
-    printf("Token row: %zd, col: %zd, pos: %zd.\n", token.row, token.col, token.pos);
-    printf("Token value: %s\n", token.value);
+        printf("Token type: %d\n", token.type);
+        printf("Token row: %zd, col: %zd, pos: %zd\n", token.row, token.col, token.pos);
+        printf("Token value: %s\n", token.value);
 
-    free(token.value);
+        if (token.value != NULL) {
+            free(token.value);
+        }
+
+        if (token.type == Eof || token.type == Invalid) {
+            break;
+        }
+    }
 }

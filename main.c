@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("Parsing...");
+    printf("Parsing...\n");
     parse(file);
 
     fclose(file);
