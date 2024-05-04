@@ -15,8 +15,10 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Failed to open file '%s', error code %d.\n", filename, error);
         return 1;
     }
+
     printf("Parsing...");
     parse(file);
+
     fclose(file);
     return 0;
 }
