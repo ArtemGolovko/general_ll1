@@ -284,11 +284,10 @@ typedef enum {
     None
 } stack_item_type_t;
 
-typedef struct stack_item_struct {
+typedef struct {
     stack_item_type_t type;
     token_type_t terminal;
     non_terminal_t non_terminal;
-    struct stack_item_struct *production;
 } stack_item_t;
 
 stack_item_t create_stack_item_terminal(token_type_t terminal) {
@@ -311,11 +310,10 @@ stack_item_t create_stack_item_epsillon() {
     return item;
 }
 
-stack_item_t create_stack_item_pop(non_terminal_t non_terminal, stack_item_t *production) {
+stack_item_t create_stack_item_pop(non_terminal_t non_terminal) {
     stack_item_t item;
     item.type = Pop;
     item.non_terminal = non_terminal;
-    item.production = production;
     return item;
 }
 
@@ -361,12 +359,14 @@ bool stack_is_empty(stack_t *stack) {
 
 typedef enum {
     Token,
-    EpsillonToken
+    EpsillonToken,
+    AST
 } semantic_stack_item_type_t;
 
 typedef struct {
     semantic_stack_item_type_t type;
     token_t token;
+    void *ast_node;
 } semantic_stack_item_t;
 
 semantic_stack_item_t create_semantic_stack_item_token(token_t token) {
@@ -379,6 +379,13 @@ semantic_stack_item_t create_semantic_stack_item_token(token_t token) {
 semantic_stack_item_t create_semantic_stak_item_epsillon() {
     semantic_stack_item_t item;
     item.type = EpsillonToken;
+    return item;
+}
+
+semantic_stack_item_t create_semantic_stak_item_ast(void *ast_node) {
+    semantic_stack_item_t item;
+    item.type = AST;
+    item.ast_node = ast_node;
     return item;
 }
 
@@ -475,11 +482,36 @@ stack_item_t *parsing_table_get(non_terminal_t non_terminal, token_type_t token)
         return items;
     }
 
-
     return NULL;
 }
 
-void parse(FILE *source) {
+typedef enum {
+    ASTItemTerminal,
+    ASTItemNonterminal,
+    ASTItemEpsillon
+} ast_item_type_t;
+
+typedef struct {
+    ast_item_type_t type;
+    char *value;
+} ast_item_t;
+
+typedef struct {
+    ast_item_t *items;
+    size_t length;
+} ast_production_t;
+
+typedef struct {
+    char *name;
+    ast_production_t *production;
+} ast_rule_t;
+
+typedef struct {
+    ast_rule_t *rules;    
+    size_t length;
+} ast_rules_t;
+
+ast_rules_t *parse(FILE *source) {
     lexer_t lexer;
     init_lexer(&lexer, source);
 
@@ -520,12 +552,13 @@ void parse(FILE *source) {
                     exit(1);
                 }
                 
-                stack_push(&stack, create_stack_item_pop(stack_top.non_terminal, production));
+                stack_push(&stack, create_stack_item_pop(stack_top.non_terminal));
 
                 for (size_t i = 0; production[i].type != None; i += 1) {
                     stack_push(&stack, production[i]); 
                 }
 
+                free(production);
                 
                 break;
             }
@@ -536,8 +569,112 @@ void parse(FILE *source) {
             }
 
             case Pop: {
-                // TODO build ast
-                free(stack_top.production);
+                switch (stack_top.non_terminal) {
+                    case Rules: {
+                        ast_rules_t *rules_prime = (ast_rules_t *)semantic_stack_pop(&semantic_stack).ast_node;
+                        ast_rule_t *rule = (ast_rule_t *)semantic_stack_pop(&semantic_stack).ast_node;
+
+                        ast_rules_t *new_node = (ast_rules_t *)malloc(sizeof(ast_rules_t));
+                        new_node->length = rules_prime->length + 1;
+                        new_node->rules = (ast_rule_t *)realloc(rules_prime->rules, new_node->length * sizeof(ast_rule_t));
+
+                        //TODO: fix ordering 
+                        new_node->rules[new_node->length - 1] = *rule;
+                        free(rules_prime);
+                        free(rule);
+
+                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
+                        semantic_stack_push(&semantic_stack, item);
+                        break;
+                    }
+                    case Rules_Prime: {
+                        semantic_stack_item_t item = semantic_stack_pop(&semantic_stack);
+
+                        if (item.type == EpsillonToken) {
+                            ast_rules_t *new_node = (ast_rules_t *)malloc(sizeof(ast_rules_t));
+                            new_node->length = 0;
+                            new_node->rules = (ast_rule_t *)malloc(0);
+
+                            semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
+                            semantic_stack_push(&semantic_stack, new_item);
+                            break;
+                        }
+
+                        semantic_stack_push(&semantic_stack, item);
+
+                        break;
+                    }
+                    case Rule: {
+                        semantic_stack_pop(&semantic_stack);
+                        ast_production_t *production = (ast_production_t *)semantic_stack_pop(&semantic_stack).ast_node;
+                        semantic_stack_pop(&semantic_stack);
+                        token_t id = semantic_stack_pop(&semantic_stack).token;
+
+                        ast_rule_t *new_node = (ast_rule_t *)malloc(sizeof(ast_rule_t));
+                        new_node->name = id.value;
+                        new_node->production = production;
+
+                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
+                        semantic_stack_push(&semantic_stack, item);
+                        break;
+                    }
+                    case Production: {
+                        ast_production_t *prodution_prime = (ast_production_t *)semantic_stack_pop(&semantic_stack).ast_node;
+                        ast_item_t *item = (ast_item_t *)semantic_stack_pop(&semantic_stack).ast_node;
+
+                        ast_production_t *new_node = (ast_production_t *)malloc(sizeof(ast_production_t));
+                        new_node->length = prodution_prime->length + 1;
+                        new_node->items = (ast_item_t *)realloc(prodution_prime->items, new_node->length * sizeof(ast_item_t));
+
+                        //TODO: fix ordering 
+                        new_node->items[new_node->length - 1] = *item;
+                        free(prodution_prime);
+                        free(item);
+                        
+                        semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
+                        semantic_stack_push(&semantic_stack, new_item);
+                        break;
+                    }
+                    case Production_Prime: {
+                        semantic_stack_item_t item = semantic_stack_pop(&semantic_stack);
+
+                        if (item.type == EpsillonToken) {
+                            ast_production_t *new_node = (ast_production_t *)malloc(sizeof(ast_production_t));
+                            new_node->length = 0;
+                            new_node->items = (ast_item_t *)malloc(0);
+
+                            semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
+                            semantic_stack_push(&semantic_stack, new_item);
+                            break;
+                        }
+
+                        semantic_stack_push(&semantic_stack, item);
+                        break;
+                    }
+                    case Item: {
+                        token_t token = semantic_stack_pop(&semantic_stack).token;
+
+                        ast_item_t *new_node =  (ast_item_t *)malloc(sizeof(ast_item_t));
+                        if (token.type == Terminal) {
+                            new_node->type = ASTItemTerminal;
+                            new_node->value = token.value;
+                        }
+
+                        if (token.type == Id) {
+                            new_node->type = ASTItemNonterminal;
+                            new_node->value = token.value;
+                        }
+
+                        if (token.type == Eps) {
+                            new_node->type = ASTItemEpsillon;
+                            new_node->value = NULL;
+                        }
+
+                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
+                        semantic_stack_push(&semantic_stack, item);
+                        break;
+                    }
+                }
                 break;
             }
 
@@ -545,7 +682,11 @@ void parse(FILE *source) {
         }
     }
 
+    ast_rules_t *ast_root = (ast_rules_t *)semantic_stack_pop(&semantic_stack).ast_node;
+
     free(stack.arr);
     free(semantic_stack.arr);
     printf("parsing success");
+
+    return ast_root;
 }

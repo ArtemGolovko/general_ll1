@@ -17,7 +17,9 @@ int main(int argc, char **argv) {
     }
 
     printf("Parsing...\n");
-    parse(file);
+    ast_rules_t *ast_root = parse(file);
+
+    // TODO: Free AST
 
     fclose(file);
     return 0;
