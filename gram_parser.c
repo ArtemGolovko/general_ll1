@@ -511,6 +511,42 @@ typedef struct {
     size_t length;
 } ast_rules_t;
 
+/*
+ * Fixes ordering in AST.
+ **/
+void AST_reverse(ast_rules_t *ast_root) {
+    size_t start = 0;
+    size_t end = ast_root->length - 1;
+    ast_rule_t tmp_rule;
+
+    while (start < end) {
+        tmp_rule = ast_root->rules[start];
+        ast_root->rules[start] = ast_root->rules[end];
+        ast_root->rules[end] = tmp_rule;
+
+        start += 1;
+        end -= 1;
+    }
+
+    ast_production_t *production;
+    ast_item_t tmp_item;
+
+    for (size_t i = 0; i < ast_root->length; i += 1) {
+        production = ast_root->rules[i].production;
+        start = 0;
+        end = production->length - 1;
+
+        while (start < end) {
+            tmp_item = production->items[start];
+            production->items[start] = production->items[end];
+            production->items[end] = tmp_item;
+
+            start += 1;
+            end -= 1;
+        }
+    }
+}
+
 ast_rules_t *parse(FILE *source) {
     lexer_t lexer;
     init_lexer(&lexer, source);
@@ -527,7 +563,7 @@ ast_rules_t *parse(FILE *source) {
     token_t current_token = lexer_next_token(&lexer);
     stack_item_t stack_top;
 
-    while(!stack_is_empty(&stack)) {
+    while (!stack_is_empty(&stack)) {
         stack_top = stack_pop(&stack);
         switch (stack_top.type) {
             case TerminalItem: {
@@ -578,7 +614,6 @@ ast_rules_t *parse(FILE *source) {
                         new_node->length = rules_prime->length + 1;
                         new_node->rules = (ast_rule_t *)realloc(rules_prime->rules, new_node->length * sizeof(ast_rule_t));
 
-                        //TODO: fix ordering 
                         new_node->rules[new_node->length - 1] = *rule;
                         free(rules_prime);
                         free(rule);
@@ -626,7 +661,6 @@ ast_rules_t *parse(FILE *source) {
                         new_node->length = prodution_prime->length + 1;
                         new_node->items = (ast_item_t *)realloc(prodution_prime->items, new_node->length * sizeof(ast_item_t));
 
-                        //TODO: fix ordering 
                         new_node->items[new_node->length - 1] = *item;
                         free(prodution_prime);
                         free(item);
@@ -683,6 +717,7 @@ ast_rules_t *parse(FILE *source) {
     }
 
     ast_rules_t *ast_root = (ast_rules_t *)semantic_stack_pop(&semantic_stack).ast_node;
+    AST_reverse(ast_root);
 
     free(stack.arr);
     free(semantic_stack.arr);
