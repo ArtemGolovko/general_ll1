@@ -547,6 +547,24 @@ void AST_reverse(ast_rules_t *ast_root) {
     }
 }
 
+void free_AST(ast_rules_t *ast_root) {
+    ast_production_t *production;
+    for (size_t i = 0; i < ast_root->length; i += 1) {
+        free(ast_root->rules[i].name);
+        production = ast_root->rules[i].production;
+
+        for (size_t j = 0; j < production->length; j += 1) {
+            free(production->items[j].value);
+        }
+
+        free(production->items);
+        free(production);
+    }
+
+    free(ast_root->rules);
+    free(ast_root);
+}
+
 ast_rules_t *parse(FILE *source) {
     lexer_t lexer;
     init_lexer(&lexer, source);
