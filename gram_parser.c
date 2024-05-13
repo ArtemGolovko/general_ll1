@@ -1,3 +1,5 @@
+#include "gram_parser.h"
+
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -485,31 +487,6 @@ stack_item_t *parsing_table_get(non_terminal_t non_terminal, token_type_t token)
     return NULL;
 }
 
-typedef enum {
-    ASTItemTerminal,
-    ASTItemNonterminal,
-    ASTItemEpsillon
-} ast_item_type_t;
-
-typedef struct {
-    ast_item_type_t type;
-    char *value;
-} ast_item_t;
-
-typedef struct {
-    ast_item_t *items;
-    size_t length;
-} ast_production_t;
-
-typedef struct {
-    char *name;
-    ast_production_t *production;
-} ast_rule_t;
-
-typedef struct {
-    ast_rule_t *rules;    
-    size_t length;
-} ast_rules_t;
 
 /*
  * Fixes ordering in AST.
@@ -739,7 +716,6 @@ ast_rules_t *parse(FILE *source) {
 
     free(stack.arr);
     free(semantic_stack.arr);
-    printf("parsing success");
 
     return ast_root;
 }

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "gram_parser.c"
+#include "gram_parser.h"
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
 
     printf("Parsing...\n");
     ast_rules_t *ast_root = parse(file);
+    printf("parsing success");
 
     free_AST(ast_root);
 
