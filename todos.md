@@ -11,7 +11,7 @@
 - [x] String (growable string)
 
 ## Stage 2: Analyzer
-- [ ] Construct symbolic table
+- [x] Construct symbolic table
 - [ ] Convert AST to grammar
 - [ ] Find firsts and follows of all non-treminals in grammar
 - [ ] Construct LL(1) parsing table
