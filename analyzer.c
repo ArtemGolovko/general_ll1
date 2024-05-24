@@ -77,6 +77,20 @@ symbolic_table_t construct_symbolic_table(ast_rules_t *ast_root) {
     return symbolic_table;
 }
 
+void free_symbolic_table(symbolic_table_t *symbolic_table) {
+    size_t i;
+    for (i = 0; i < symbolic_table->terminals_length; i += 1) {
+        free(symbolic_table->terminals[i]);
+    }
+    
+    for (i = 0; i < symbolic_table->non_terminals_length; i += 1) {
+        free(symbolic_table->non_terminals[i]);
+    }
+
+    free(symbolic_table->terminals);
+    free(symbolic_table->non_terminals);
+}
+
 analysis_result_t analyze(ast_rules_t *ast_root) {
     symbolic_table_t symbolic_table = construct_symbolic_table(ast_root);
     analysis_result_t result = { symbolic_table };

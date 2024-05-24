@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     printf("analysis success\n\n");
 
     free_AST(ast_root);
+    free_symbolic_table(&analysis_result.symbolic_table);
 
     fclose(file);
     return 0;

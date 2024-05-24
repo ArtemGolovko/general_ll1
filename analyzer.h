@@ -15,6 +15,7 @@ typedef struct {
     symbolic_table_t symbolic_table;
 } analysis_result_t;
 
+void free_symbolic_table(symbolic_table_t *symbolic_table);
 analysis_result_t analyze(ast_rules_t *ast_root);
 
 #endif
