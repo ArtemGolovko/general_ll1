@@ -36,11 +36,37 @@ void free_vector(void *vector) {
     free(begin);
 }
 
-vector_metadata_t get_vector_metadata(void *vector) {
+vector_metadata_t *get_vector_metadata(void *vector) {
     char *begin = (char *)vector;
     begin -= sizeof(vector_metadata_t);
 
-    vector_metadata_t metadata = *(vector_metadata_t *)begin;
+    return (vector_metadata_t *)begin;
+}
 
-    return metadata;
+void *vector_grow(void *vector) {
+    vector_metadata_t *metadata = get_vector_metadata(vector);
+
+    metadata->cap += GROWH_RATE;
+
+    char *begin = (char *)vector;
+    begin -= sizeof(vector_metadata_t);
+
+    char *new_vector = realloc(begin, sizeof(vector_metadata_t) + metadata->item_size * metadata->cap);
+
+    new_vector += sizeof(vector_metadata_t);
+
+    return new_vector;
+}
+
+void vector_push(void **vector, void *item) {
+    vector_metadata_t *metadata = get_vector_metadata(*vector);
+
+    if (metadata->cap < metadata->length + 1) {
+        *vector = vector_grow(*vector);
+        metadata = get_vector_metadata(*vector);
+    }
+
+    char *begin = *vector;
+    memcpy(begin + metadata->item_size * metadata->length, item, metadata->item_size);
+    metadata->length += 1;
 }

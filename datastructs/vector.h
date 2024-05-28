@@ -17,7 +17,7 @@ typedef struct {
     size_t length;
 } vector_metadata_t;
 
-vector_metadata_t get_vector_metadata(void *vector);
+vector_metadata_t *get_vector_metadata(void *vector);
 #endif
 
 #endif
