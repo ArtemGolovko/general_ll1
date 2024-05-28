@@ -5,6 +5,11 @@
 - [x] Fix ordering issues in AST
 - [x] Create function to free AST 
 
+## Refactor 1: Introduce common data structures
+- [ ] Vector (dynamic array)
+- [ ] Double linked list
+- [ ] String (growable string)
+
 ## Stage 2: Analyzer
 - [ ] Construct symbolic table
 - [ ] Convert AST to grammar
