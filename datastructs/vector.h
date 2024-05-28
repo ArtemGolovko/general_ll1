@@ -7,6 +7,8 @@ void free_vector(void *vector);
 void *vector_at(void *vector, size_t index);
 void vector_push(void **vector, void *item);
 
+size_t vector_len(void *vector);
+
 #ifdef TEST
 
 #define GROWH_RATE 5
@@ -18,6 +20,7 @@ typedef struct {
 } vector_metadata_t;
 
 vector_metadata_t *get_vector_metadata(void *vector);
+
 #endif
 
 #endif

@@ -43,6 +43,11 @@ vector_metadata_t *get_vector_metadata(void *vector) {
     return (vector_metadata_t *)begin;
 }
 
+size_t vector_len(void *vector) {
+    vector_metadata_t *metadata = get_vector_metadata(vector);
+    return metadata->length;
+}
+
 void *vector_grow(void *vector) {
     vector_metadata_t *metadata = get_vector_metadata(vector);
 
