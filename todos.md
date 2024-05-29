@@ -6,7 +6,7 @@
 - [x] Create function to free AST 
 
 ## Refactor 1: Introduce common data structures
-- [ ] Vector (dynamic array)
+- [x] Vector (dynamic array)
 - [ ] Double linked list
 - [ ] String (growable string)
 

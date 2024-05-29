@@ -66,12 +66,26 @@ void *vector_grow(void *vector) {
 void vector_push(void **vector, void *item) {
     vector_metadata_t *metadata = get_vector_metadata(*vector);
 
-    if (metadata->cap < metadata->length + 1) {
+    if (metadata->cap <= metadata->length) {
         *vector = vector_grow(*vector);
         metadata = get_vector_metadata(*vector);
     }
 
     char *begin = *vector;
     memcpy(begin + metadata->item_size * metadata->length, item, metadata->item_size);
+    metadata->length += 1;
+}
+
+void vector_push_front(void **vector, void *item) {
+    vector_metadata_t *metadata = get_vector_metadata(*vector);
+
+    if (metadata->cap <= metadata->length) {
+        *vector = vector_grow(*vector);
+        metadata = get_vector_metadata(*vector);
+    }
+
+    char *begin = *vector;
+    memmove(begin + metadata->item_size, begin, metadata->item_size * metadata->length);
+    memcpy(begin, item, metadata->item_size);
     metadata->length += 1;
 }
