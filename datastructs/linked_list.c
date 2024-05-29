@@ -106,4 +106,11 @@ void linked_list_pop(void *list, void *item) {
     free(linked_list->tail);
 
     linked_list->tail = (void *)prev_metadata;
+    linked_list -= 1;
+}
+
+size_t linked_list_len(void *list) {
+    linked_list_t *linked_list = list;
+
+    return linked_list->length;
 }
