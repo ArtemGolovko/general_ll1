@@ -7,7 +7,7 @@
 
 ## Refactor 1: Introduce common data structures
 - [x] Vector (dynamic array)
-- [ ] Double linked list
+- [x] Double linked list
 - [ ] String (growable string)
 
 ## Stage 2: Analyzer
