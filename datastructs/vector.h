@@ -4,8 +4,8 @@
 void *new_vector(size_t item_size, size_t cap);
 void free_vector(void *vector);
 
-void vector_push(void **vector, void *item);
-void vector_push_front(void **vector, void *item);
+void vector_push(void **vector, const void *item);
+void vector_push_front(void **vector, const void *item);
 
 size_t vector_len(void *vector);
 

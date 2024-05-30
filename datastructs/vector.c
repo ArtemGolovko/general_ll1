@@ -63,7 +63,7 @@ void *vector_grow(void *vector) {
     return new_vector;
 }
 
-void vector_push(void **vector, void *item) {
+void vector_push(void **vector, const void *item) {
     vector_metadata_t *metadata = get_vector_metadata(*vector);
 
     if (metadata->cap <= metadata->length) {
@@ -76,7 +76,7 @@ void vector_push(void **vector, void *item) {
     metadata->length += 1;
 }
 
-void vector_push_front(void **vector, void *item) {
+void vector_push_front(void **vector, const void *item) {
     vector_metadata_t *metadata = get_vector_metadata(*vector);
 
     if (metadata->cap <= metadata->length) {
