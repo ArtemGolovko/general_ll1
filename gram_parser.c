@@ -8,6 +8,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include "datastructs/string.h"
+
 typedef enum {
     Invalid,
     Eof,
@@ -21,7 +23,10 @@ typedef enum {
 
 typedef struct {
     token_type_t type;
+
+    /** string */
     char *value;
+
     size_t row;
     size_t col;
     size_t pos;
@@ -118,20 +123,13 @@ void lexer_skip_whitespace_and_comments(lexer_t *lexer) {
 
 token_t lexer_read_Id(lexer_t *lexer) {
     char c;
-    char *buffer = (char *)malloc(15 * sizeof(char));
-    size_t buffer_length = 14;
-    size_t buffer_usage = 0;
+    char *value = new_string(0);
 
     while (!feof(lexer->source) && c != -1) {
         c = fgetc(lexer->source);
         if (isalpha(c) || c == '_') {
-            if (buffer_usage + 1 >= buffer_length) {
-                buffer_length += 15;
-                buffer = realloc(buffer, buffer_length * sizeof(char));
-            }
 
-            buffer[buffer_usage] = c;
-            buffer_usage += 1;
+            string_push(&value, c);
             continue;
         }
 
@@ -139,13 +137,9 @@ token_t lexer_read_Id(lexer_t *lexer) {
         fseek(lexer->source, -1, SEEK_CUR);
         token_t token;
 
-        init_token(&token, lexer, Id, buffer_usage);
-        token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
+        init_token(&token, lexer, Id, string_len(value));
+        token.value = value; 
 
-        buffer[buffer_usage] = '\0';
-        strcpy_s(token.value, buffer_usage + 1, buffer);
-
-        free(buffer);
 
         return token;
     }
@@ -153,13 +147,8 @@ token_t lexer_read_Id(lexer_t *lexer) {
     fseek(lexer->source, -1, SEEK_CUR);
     token_t token;
 
-    init_token(&token, lexer, Id, buffer_usage);
-    token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
-
-    buffer[buffer_usage] = '\0';
-    strcpy_s(token.value, buffer_usage + 1, buffer);
-
-    free(buffer);
+    init_token(&token, lexer, Id, string_len(value));
+    token.value = value;
 
     return token;
 }
@@ -167,9 +156,7 @@ token_t lexer_read_Id(lexer_t *lexer) {
 token_t lexer_read_Terminal(lexer_t *lexer) {
     char c;
     bool is_prev_backslash = false;
-    char *buffer = (char *)malloc(15 * sizeof(char));
-    size_t buffer_length = 14;
-    size_t buffer_usage = 0;
+    char *value = new_string(0);
 
     while (!feof(lexer->source) && c != -1) {
         c = fgetc(lexer->source);
@@ -177,32 +164,22 @@ token_t lexer_read_Terminal(lexer_t *lexer) {
         if (!is_prev_backslash && c == '"') {
             token_t token;
 
-            init_token(&token, lexer, Terminal, buffer_usage);
-            token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
-
-            buffer[buffer_usage] = '\0';
-            strcpy_s(token.value, buffer_usage + 1, buffer);
-
-            free(buffer);
+            init_token(&token, lexer, Terminal, string_len(value));
+            token.value = value;
 
             return token;
         }
-        
+
         is_prev_backslash = c == '\\';
 
-        if (buffer_usage + 1 >= buffer_length) {
-            buffer_length += 15;
-            buffer = realloc(buffer, buffer_length * sizeof(char));
-        }
-
-        buffer[buffer_usage] = c;
-        buffer_usage += 1;
+        string_push(&value, c);
     }
-    
-    free(buffer);
+
 
     token_t token;
-    init_token(&token, lexer, Invalid, buffer_usage + 1);
+    init_token(&token, lexer, Invalid, string_len(value));
+
+    free_string(value);
     return token;
 }
 
@@ -527,11 +504,11 @@ void AST_reverse(ast_rules_t *ast_root) {
 void free_AST(ast_rules_t *ast_root) {
     ast_production_t *production;
     for (size_t i = 0; i < ast_root->length; i += 1) {
-        free(ast_root->rules[i].name);
+        free_string(ast_root->rules[i].name);
         production = ast_root->rules[i].production;
 
         for (size_t j = 0; j < production->length; j += 1) {
-            free(production->items[j].value);
+            free_string(production->items[j].value);
         }
 
         free(production->items);

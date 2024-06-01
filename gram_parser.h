@@ -11,6 +11,8 @@ typedef enum {
 
 typedef struct {
     ast_item_type_t type;
+
+    /** string */
     char *value;
 } ast_item_t;
 
@@ -20,7 +22,9 @@ typedef struct {
 } ast_production_t;
 
 typedef struct {
+    /** string */
     char *name;
+
     ast_production_t *production;
 } ast_rule_t;
 
