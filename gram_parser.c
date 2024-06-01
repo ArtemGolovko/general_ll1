@@ -260,8 +260,6 @@ typedef enum {
     NonTerminal,
     Epsillon,
     Pop,
-    /* Terminates colletion of items. */
-    None
 } stack_item_type_t;
 
 typedef struct {
@@ -270,44 +268,42 @@ typedef struct {
     non_terminal_t non_terminal;
 } stack_item_t;
 
-stack_item_t create_stack_item_terminal(token_type_t terminal) {
-    stack_item_t item;
-    item.type = TerminalItem;
-    item.terminal = terminal;
-    return item;
-}
-
-stack_item_t create_stack_item_non_terminal(non_terminal_t non_terminal) {
-    stack_item_t item;
-    item.type = NonTerminal;
-    item.non_terminal = non_terminal;
-    return item;
-}
-
-stack_item_t create_stack_item_epsillon() {
-    stack_item_t item;
-    item.type = Epsillon;
-    return item;
-}
-
-stack_item_t create_stack_item_pop(non_terminal_t non_terminal) {
-    stack_item_t item;
-    item.type = Pop;
-    item.non_terminal = non_terminal;
-    return item;
-}
-
-stack_item_t create_stack_item_none() {
-    stack_item_t item;
-    item.type = None;
-    return item;
-}
-
 void *new_stack() {
     return new_linked_list(sizeof(stack_item_t));
 }
 
 void stack_push(void *stack, stack_item_t item) {
+    linked_list_push(stack, &item);
+}
+
+void stack_push_termianl(void *stack, token_type_t terminal) {
+    stack_item_t item;
+    item.type = TerminalItem;
+    item.terminal = terminal;
+
+    linked_list_push(stack, &item);
+}
+
+void stack_push_non_terminal(void *stack, non_terminal_t non_terminal) {
+    stack_item_t item;
+    item.type = NonTerminal;
+    item.non_terminal = non_terminal;
+
+    linked_list_push(stack, &item);
+}
+
+void stack_push_epsillon(void *stack) {
+    stack_item_t item;
+    item.type = Epsillon;
+
+    linked_list_push(stack, &item);
+}
+
+void stack_push_pop(void *stack, non_terminal_t non_termianl) {
+    stack_item_t item;
+    item.type = Pop;
+    item.non_terminal = non_termianl;
+
     linked_list_push(stack, &item);
 }
 
@@ -378,70 +374,57 @@ void free_semantic_stack(void *stack) {
     free_linked_list(stack);
 }
 
-stack_item_t *parsing_table_get(non_terminal_t non_terminal, token_type_t token) {
+/** Returns stack */
+void *parsing_table_get(non_terminal_t non_terminal, token_type_t token) {
+    void *prod = new_stack();
+
     if (non_terminal == Rules && token == Id) {
-        stack_item_t *items = (stack_item_t *)malloc(3 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Rules_Prime);
-        items[1] = create_stack_item_non_terminal(Rule);
-        items[2] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Rule);
+        stack_push_non_terminal(prod, Rules_Prime);
+        return prod;
     }
 
     if (non_terminal == Rules_Prime && token == Id) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Rules);
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Rules);
+        return prod;
     }
 
     if (non_terminal == Rules_Prime && token == Eof) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_epsillon();
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_epsillon(prod);
+        return prod;
     }
 
 
     if (non_terminal == Rule && token == Id) {
-        stack_item_t *items = (stack_item_t *)malloc(5 * sizeof(stack_item_t));
-        items[0] = create_stack_item_terminal(Semicolon);
-        items[1] = create_stack_item_non_terminal(Production);
-        items[2] = create_stack_item_terminal(Arrow);
-        items[3] = create_stack_item_terminal(Id);
-        items[4] = create_stack_item_none();
-        return items;
+        stack_push_termianl(prod, Id);
+        stack_push_termianl(prod, Arrow);
+        stack_push_non_terminal(prod, Production);
+        stack_push_termianl(prod, Semicolon);
+        return prod;
     }
 
     if (non_terminal == Production && (token == Id || token == Terminal || token == Eps)) {
-        stack_item_t *items = (stack_item_t *)malloc(3 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Production_Prime);
-        items[1] = create_stack_item_non_terminal(Item);
-        items[2] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Item);
+        stack_push_non_terminal(prod, Production_Prime);
+        return prod;
     }
 
     if (non_terminal == Production_Prime && (token == Id || token == Terminal || token == Eps)) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Production);
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Production);
+        return prod;
     }
 
     if (non_terminal == Production_Prime && token == Semicolon) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_epsillon();
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_epsillon(prod);
+        return prod;
     }
 
     if (non_terminal == Item && (token == Id || token == Terminal || token == Eps)) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_terminal(token);
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_termianl(prod, token);
+        return prod;
     }
 
-    return NULL;
+    return prod;
 }
 
 
@@ -505,16 +488,16 @@ ast_rules_t *parse(FILE *source) {
 
     void *stack = new_stack();
 
-    stack_push(stack, create_stack_item_terminal(Eof));
-    stack_push(stack, create_stack_item_non_terminal(Rules));
+    stack_push_termianl(stack, Eof);
+    stack_push_non_terminal(stack, Rules);
 
     void *semantic_stack = new_semantic_stack();
 
     token_t current_token = lexer_next_token(&lexer);
     stack_item_t stack_top;
 
-    while (!stack_is_empty(&stack)) {
-        stack_top = stack_pop(&stack);
+    while (!stack_is_empty(stack)) {
+        stack_top = stack_pop(stack);
         switch (stack_top.type) {
             case TerminalItem: {
                 if (stack_top.terminal != current_token.type) {
@@ -532,19 +515,22 @@ ast_rules_t *parse(FILE *source) {
             }
 
             case NonTerminal: {
-                stack_item_t *production = parsing_table_get(stack_top.non_terminal, current_token.type);
-                if (production == NULL) {
+                void *production = parsing_table_get(stack_top.non_terminal, current_token.type);
+
+                if (stack_is_empty(production)) {
+                    free_stack(production);
+
                     perror("Parsing error 2");
                     exit(1);
                 }
                 
-                stack_push(stack, create_stack_item_pop(stack_top.non_terminal));
-
-                for (size_t i = 0; production[i].type != None; i += 1) {
-                    stack_push(stack, production[i]); 
+                stack_push_pop(stack, stack_top.non_terminal);
+                
+                while (!stack_is_empty(production)) {
+                    stack_push(stack, stack_pop(production)); 
                 }
 
-                free(production);
+                free_stack(production);
                 
                 break;
             }
@@ -661,8 +647,6 @@ ast_rules_t *parse(FILE *source) {
                 }
                 break;
             }
-
-            case None: break;
         }
     }
 
@@ -671,5 +655,6 @@ ast_rules_t *parse(FILE *source) {
 
     free_stack(stack);
     free_semantic_stack(semantic_stack);
+
     return ast_root;
 }
