@@ -25,6 +25,8 @@ int main(int argc, char **argv) {
     analysis_result_t analysis_result = analyze(ast_root);
     printf("analysis success\n\n");
 
+    display_symbolic_table(&analysis_result.symbolic_table);
+
     free_AST(ast_root);
     free_symbolic_table(&analysis_result.symbolic_table);
 

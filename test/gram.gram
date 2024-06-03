@@ -1,0 +1,20 @@
+/**
+ * Gram language grammar written in Gram language.
+ **/
+Rules -> Rule Rules_Prime;
+Rules_Prime -> Rules;
+Rules_Prime -> eps;
+
+Rule -> Id "->" Production ";";
+Production -> Item Production_Prime;
+Production_Prime -> Production;
+Production_Prime -> eps;
+
+Item -> Id;
+Item -> Terminal;
+Item -> "eps";
+
+// Terminals 
+// This syntax is not a part of Gram language.
+Terminal -> "Terminal";
+Id -> "Id";
