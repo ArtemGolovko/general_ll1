@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 #include "datastructs/string.h"
 #include "datastructs/linked_list.h"
