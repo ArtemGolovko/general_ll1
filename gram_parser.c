@@ -10,6 +10,7 @@
 
 #include "datastructs/string.h"
 #include "datastructs/linked_list.h"
+#include "datastructs/vector.h"
 
 typedef enum {
     Invalid,
@@ -428,58 +429,21 @@ void *parsing_table_get(non_terminal_t non_terminal, token_type_t token) {
     return prod;
 }
 
-
-/*
- * Fixes ordering in AST.
- **/
-void AST_reverse(ast_rules_t *ast_root) {
-    size_t start = 0;
-    size_t end = ast_root->length - 1;
-    ast_rule_t tmp_rule;
-
-    while (start < end) {
-        tmp_rule = ast_root->rules[start];
-        ast_root->rules[start] = ast_root->rules[end];
-        ast_root->rules[end] = tmp_rule;
-
-        start += 1;
-        end -= 1;
-    }
-
-    ast_production_t *production;
-    ast_item_t tmp_item;
-
-    for (size_t i = 0; i < ast_root->length; i += 1) {
-        production = ast_root->rules[i].production;
-        start = 0;
-        end = production->length - 1;
-
-        while (start < end) {
-            tmp_item = production->items[start];
-            production->items[start] = production->items[end];
-            production->items[end] = tmp_item;
-
-            start += 1;
-            end -= 1;
-        }
-    }
-}
-
 void free_AST(ast_rules_t *ast_root) {
     ast_production_t *production;
-    for (size_t i = 0; i < ast_root->length; i += 1) {
+    for (size_t i = 0; i < vector_len(ast_root->rules); i += 1) {
         free_string(ast_root->rules[i].name);
         production = ast_root->rules[i].production;
 
-        for (size_t j = 0; j < production->length; j += 1) {
+        for (size_t j = 0; j < vector_len(production->items); j += 1) {
             free_string(production->items[j].value);
         }
 
-        free(production->items);
+        free_vector(production->items);
         free(production);
     }
 
-    free(ast_root->rules);
+    free_vector(ast_root->rules);
     free(ast_root);
 }
 
@@ -548,10 +512,10 @@ ast_rules_t *parse(FILE *source) {
                         ast_rule_t *rule = (ast_rule_t *)semantic_stack_pop(semantic_stack).ast_node;
 
                         ast_rules_t *new_node = (ast_rules_t *)malloc(sizeof(ast_rules_t));
-                        new_node->length = rules_prime->length + 1;
-                        new_node->rules = (ast_rule_t *)realloc(rules_prime->rules, new_node->length * sizeof(ast_rule_t));
 
-                        new_node->rules[new_node->length - 1] = *rule;
+                        new_node->rules = rules_prime->rules;
+                        vector_push_front((void **)&new_node->rules, rule);
+
                         free(rules_prime);
                         free(rule);
 
@@ -563,8 +527,7 @@ ast_rules_t *parse(FILE *source) {
 
                         if (item.type == EpsillonToken) {
                             ast_rules_t *new_node = (ast_rules_t *)malloc(sizeof(ast_rules_t));
-                            new_node->length = 0;
-                            new_node->rules = (ast_rule_t *)malloc(0);
+                            new_node->rules = new_vector(sizeof(ast_rule_t), 0);
 
                             semantic_stack_push_ast(semantic_stack, new_node);
                             break;
@@ -592,10 +555,10 @@ ast_rules_t *parse(FILE *source) {
                         ast_item_t *item = (ast_item_t *)semantic_stack_pop(semantic_stack).ast_node;
 
                         ast_production_t *new_node = (ast_production_t *)malloc(sizeof(ast_production_t));
-                        new_node->length = prodution_prime->length + 1;
-                        new_node->items = (ast_item_t *)realloc(prodution_prime->items, new_node->length * sizeof(ast_item_t));
+                        new_node->items = prodution_prime->items;
 
-                        new_node->items[new_node->length - 1] = *item;
+                        vector_push_front((void **)&new_node->items, item);
+
                         free(prodution_prime);
                         free(item);
                         
@@ -607,8 +570,7 @@ ast_rules_t *parse(FILE *source) {
 
                         if (item.type == EpsillonToken) {
                             ast_production_t *new_node = (ast_production_t *)malloc(sizeof(ast_production_t));
-                            new_node->length = 0;
-                            new_node->items = (ast_item_t *)malloc(0);
+                            new_node->items = new_vector(sizeof(ast_item_t), 0);
 
                             semantic_stack_push_ast(semantic_stack, new_node);
                             break;
@@ -646,7 +608,6 @@ ast_rules_t *parse(FILE *source) {
     }
 
     ast_rules_t *ast_root = (ast_rules_t *)semantic_stack_pop(semantic_stack).ast_node;
-    AST_reverse(ast_root);
 
     free_stack(stack);
     free_semantic_stack(semantic_stack);

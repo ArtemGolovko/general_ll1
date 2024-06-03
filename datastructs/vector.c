@@ -30,6 +30,10 @@ void *new_vector(size_t item_size, size_t cap) {
 }
 
 void free_vector(void *vector) {
+    if (vector == NULL) {
+        return;
+    }
+
     char *begin = (char *)vector;
     begin -= sizeof(vector_metadata_t);
 

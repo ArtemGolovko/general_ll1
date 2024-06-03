@@ -17,8 +17,8 @@ typedef struct {
 } ast_item_t;
 
 typedef struct {
+    /** vector */
     ast_item_t *items;
-    size_t length;
 } ast_production_t;
 
 typedef struct {
@@ -29,8 +29,8 @@ typedef struct {
 } ast_rule_t;
 
 typedef struct {
+    /** vector */
     ast_rule_t *rules;    
-    size_t length;
 } ast_rules_t;
 
 void free_AST(ast_rules_t *ast_root);

@@ -29,6 +29,10 @@ char *new_string(size_t cap) {
 }
 
 void free_string(char *string) {
+    if (string == NULL) {
+        return;
+    }
+
     string -= sizeof(string_metadata_t);
 
     free(string);
