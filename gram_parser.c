@@ -334,32 +334,33 @@ typedef struct {
     void *ast_node;
 } semantic_stack_item_t;
 
-semantic_stack_item_t create_semantic_stack_item_token(token_t token) {
-    semantic_stack_item_t item;
-    item.type = Token; 
-    item.token = token;
-    return item;
-}
-
-semantic_stack_item_t create_semantic_stak_item_epsillon() {
-    semantic_stack_item_t item;
-    item.type = EpsillonToken;
-    return item;
-}
-
-semantic_stack_item_t create_semantic_stak_item_ast(void *ast_node) {
-    semantic_stack_item_t item;
-    item.type = AST;
-    item.ast_node = ast_node;
-    return item;
-}
-
-
 void *new_semantic_stack() {
     return new_linked_list(sizeof(semantic_stack_item_t));
 }
 
 void semantic_stack_push(void *stack, semantic_stack_item_t item) {
+    linked_list_push(stack, &item);
+}
+void semantic_stack_push_token(void *stack, token_t token) {
+    semantic_stack_item_t item;
+    item.type = Token; 
+    item.token = token;
+
+    linked_list_push(stack, &item);
+}
+
+void semantic_stack_push_epsillion(void *stack) {
+    semantic_stack_item_t item;
+    item.type = EpsillonToken; 
+
+    linked_list_push(stack, &item);
+}
+
+void semantic_stack_push_ast(void *stack, void *ast_node) {
+    semantic_stack_item_t item;
+    item.type = AST; 
+    item.ast_node = ast_node;
+
     linked_list_push(stack, &item);
 }
 
@@ -506,7 +507,7 @@ ast_rules_t *parse(FILE *source) {
                 }
 
                 if (current_token.type != Eof) {
-                    semantic_stack_push(semantic_stack, create_semantic_stack_item_token(current_token));
+                    semantic_stack_push_token(semantic_stack, current_token);
                 }
 
                 current_token = lexer_next_token(&lexer);
@@ -536,7 +537,7 @@ ast_rules_t *parse(FILE *source) {
             }
 
             case Epsillon: {
-                semantic_stack_push(semantic_stack, create_semantic_stak_item_epsillon());
+                semantic_stack_push_epsillion(semantic_stack);
                 break;
             }
 
@@ -554,8 +555,7 @@ ast_rules_t *parse(FILE *source) {
                         free(rules_prime);
                         free(rule);
 
-                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(semantic_stack, item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                     case Rules_Prime: {
@@ -566,8 +566,7 @@ ast_rules_t *parse(FILE *source) {
                             new_node->length = 0;
                             new_node->rules = (ast_rule_t *)malloc(0);
 
-                            semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
-                            semantic_stack_push(semantic_stack, new_item);
+                            semantic_stack_push_ast(semantic_stack, new_node);
                             break;
                         }
 
@@ -585,8 +584,7 @@ ast_rules_t *parse(FILE *source) {
                         new_node->name = id.value;
                         new_node->production = production;
 
-                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(semantic_stack, item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                     case Production: {
@@ -601,8 +599,7 @@ ast_rules_t *parse(FILE *source) {
                         free(prodution_prime);
                         free(item);
                         
-                        semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(semantic_stack, new_item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                     case Production_Prime: {
@@ -613,8 +610,7 @@ ast_rules_t *parse(FILE *source) {
                             new_node->length = 0;
                             new_node->items = (ast_item_t *)malloc(0);
 
-                            semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
-                            semantic_stack_push(semantic_stack, new_item);
+                            semantic_stack_push_ast(semantic_stack, new_node);
                             break;
                         }
 
@@ -640,8 +636,7 @@ ast_rules_t *parse(FILE *source) {
                             new_node->value = NULL;
                         }
 
-                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(semantic_stack, item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                 }
