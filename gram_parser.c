@@ -8,6 +8,10 @@
 #include <string.h>
 #include <assert.h>
 
+#include "datastructs/string.h"
+#include "datastructs/linked_list.h"
+#include "datastructs/vector.h"
+
 typedef enum {
     Invalid,
     Eof,
@@ -21,7 +25,10 @@ typedef enum {
 
 typedef struct {
     token_type_t type;
+
+    /** string */
     char *value;
+
     size_t row;
     size_t col;
     size_t pos;
@@ -118,20 +125,13 @@ void lexer_skip_whitespace_and_comments(lexer_t *lexer) {
 
 token_t lexer_read_Id(lexer_t *lexer) {
     char c;
-    char *buffer = (char *)malloc(15 * sizeof(char));
-    size_t buffer_length = 14;
-    size_t buffer_usage = 0;
+    char *value = new_string(0);
 
     while (!feof(lexer->source) && c != -1) {
         c = fgetc(lexer->source);
         if (isalpha(c) || c == '_') {
-            if (buffer_usage + 1 >= buffer_length) {
-                buffer_length += 15;
-                buffer = realloc(buffer, buffer_length * sizeof(char));
-            }
 
-            buffer[buffer_usage] = c;
-            buffer_usage += 1;
+            string_push(&value, c);
             continue;
         }
 
@@ -139,13 +139,9 @@ token_t lexer_read_Id(lexer_t *lexer) {
         fseek(lexer->source, -1, SEEK_CUR);
         token_t token;
 
-        init_token(&token, lexer, Id, buffer_usage);
-        token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
+        init_token(&token, lexer, Id, string_len(value));
+        token.value = value; 
 
-        buffer[buffer_usage] = '\0';
-        strcpy_s(token.value, buffer_usage + 1, buffer);
-
-        free(buffer);
 
         return token;
     }
@@ -153,13 +149,8 @@ token_t lexer_read_Id(lexer_t *lexer) {
     fseek(lexer->source, -1, SEEK_CUR);
     token_t token;
 
-    init_token(&token, lexer, Id, buffer_usage);
-    token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
-
-    buffer[buffer_usage] = '\0';
-    strcpy_s(token.value, buffer_usage + 1, buffer);
-
-    free(buffer);
+    init_token(&token, lexer, Id, string_len(value));
+    token.value = value;
 
     return token;
 }
@@ -167,9 +158,7 @@ token_t lexer_read_Id(lexer_t *lexer) {
 token_t lexer_read_Terminal(lexer_t *lexer) {
     char c;
     bool is_prev_backslash = false;
-    char *buffer = (char *)malloc(15 * sizeof(char));
-    size_t buffer_length = 14;
-    size_t buffer_usage = 0;
+    char *value = new_string(0);
 
     while (!feof(lexer->source) && c != -1) {
         c = fgetc(lexer->source);
@@ -177,32 +166,22 @@ token_t lexer_read_Terminal(lexer_t *lexer) {
         if (!is_prev_backslash && c == '"') {
             token_t token;
 
-            init_token(&token, lexer, Terminal, buffer_usage);
-            token.value = (char *)malloc((buffer_usage + 1) * sizeof(char));
-
-            buffer[buffer_usage] = '\0';
-            strcpy_s(token.value, buffer_usage + 1, buffer);
-
-            free(buffer);
+            init_token(&token, lexer, Terminal, string_len(value));
+            token.value = value;
 
             return token;
         }
-        
+
         is_prev_backslash = c == '\\';
 
-        if (buffer_usage + 1 >= buffer_length) {
-            buffer_length += 15;
-            buffer = realloc(buffer, buffer_length * sizeof(char));
-        }
-
-        buffer[buffer_usage] = c;
-        buffer_usage += 1;
+        string_push(&value, c);
     }
-    
-    free(buffer);
+
 
     token_t token;
-    init_token(&token, lexer, Invalid, buffer_usage + 1);
+    init_token(&token, lexer, Invalid, string_len(value));
+
+    free_string(value);
     return token;
 }
 
@@ -282,8 +261,6 @@ typedef enum {
     NonTerminal,
     Epsillon,
     Pop,
-    /* Terminates colletion of items. */
-    None
 } stack_item_type_t;
 
 typedef struct {
@@ -292,71 +269,58 @@ typedef struct {
     non_terminal_t non_terminal;
 } stack_item_t;
 
-stack_item_t create_stack_item_terminal(token_type_t terminal) {
+void *new_stack() {
+    return new_linked_list(sizeof(stack_item_t));
+}
+
+void stack_push(void *stack, stack_item_t item) {
+    linked_list_push(stack, &item);
+}
+
+void stack_push_termianl(void *stack, token_type_t terminal) {
     stack_item_t item;
     item.type = TerminalItem;
     item.terminal = terminal;
-    return item;
+
+    linked_list_push(stack, &item);
 }
 
-stack_item_t create_stack_item_non_terminal(non_terminal_t non_terminal) {
+void stack_push_non_terminal(void *stack, non_terminal_t non_terminal) {
     stack_item_t item;
     item.type = NonTerminal;
     item.non_terminal = non_terminal;
-    return item;
+
+    linked_list_push(stack, &item);
 }
 
-stack_item_t create_stack_item_epsillon() {
+void stack_push_epsillon(void *stack) {
     stack_item_t item;
     item.type = Epsillon;
-    return item;
+
+    linked_list_push(stack, &item);
 }
 
-stack_item_t create_stack_item_pop(non_terminal_t non_terminal) {
+void stack_push_pop(void *stack, non_terminal_t non_termianl) {
     stack_item_t item;
     item.type = Pop;
-    item.non_terminal = non_terminal;
-    return item;
+    item.non_terminal = non_termianl;
+
+    linked_list_push(stack, &item);
 }
 
-stack_item_t create_stack_item_none() {
+stack_item_t stack_pop(void *stack) {
     stack_item_t item;
-    item.type = None;
+    linked_list_pop(stack, &item);
+
     return item;
 }
 
-typedef struct {
-    stack_item_t *arr;
-    size_t arr_size;
-    size_t top;
-} stack_t;
-
-void init_stack(stack_t *stack) {
-    stack->arr = (stack_item_t *)malloc(15 * sizeof(stack_item_t));
-    stack->arr_size = 15;
-    stack->top = -1;
+bool stack_is_empty(void *stack) {
+    return linked_list_len(stack) == 0;
 }
 
-void stack_push(stack_t *stack, stack_item_t item) {
-    if (stack->top >= stack->arr_size - 1) {
-        stack->arr_size += 15;
-        stack->arr = (stack_item_t *)realloc(stack->arr,  stack->arr_size*sizeof(stack_item_t));
-    }
-
-    stack->top += 1;
-    stack->arr[stack->top] = item;
-}
-
-stack_item_t stack_pop(stack_t *stack) {
-    assert(stack->top != -1);
-    stack_item_t item = stack->arr[stack->top];
-
-    stack->top -= 1;
-    return item;
-}
-
-bool stack_is_empty(stack_t *stack) {
-    return stack->top == -1;
+void free_stack(void *stack) {
+    free_linked_list(stack);
 }
 
 typedef enum {
@@ -371,174 +335,115 @@ typedef struct {
     void *ast_node;
 } semantic_stack_item_t;
 
-semantic_stack_item_t create_semantic_stack_item_token(token_t token) {
+void *new_semantic_stack() {
+    return new_linked_list(sizeof(semantic_stack_item_t));
+}
+
+void semantic_stack_push(void *stack, semantic_stack_item_t item) {
+    linked_list_push(stack, &item);
+}
+void semantic_stack_push_token(void *stack, token_t token) {
     semantic_stack_item_t item;
     item.type = Token; 
     item.token = token;
-    return item;
+
+    linked_list_push(stack, &item);
 }
 
-semantic_stack_item_t create_semantic_stak_item_epsillon() {
+void semantic_stack_push_epsillion(void *stack) {
     semantic_stack_item_t item;
-    item.type = EpsillonToken;
-    return item;
+    item.type = EpsillonToken; 
+
+    linked_list_push(stack, &item);
 }
 
-semantic_stack_item_t create_semantic_stak_item_ast(void *ast_node) {
+void semantic_stack_push_ast(void *stack, void *ast_node) {
     semantic_stack_item_t item;
-    item.type = AST;
+    item.type = AST; 
     item.ast_node = ast_node;
+
+    linked_list_push(stack, &item);
+}
+
+semantic_stack_item_t semantic_stack_pop(void *stack) {
+    semantic_stack_item_t item;
+    linked_list_pop(stack, &item);
+
     return item;
 }
 
-typedef struct {
-    semantic_stack_item_t *arr;
-    size_t arr_size;
-    size_t top;
-} semantic_stack_t;
-
-void init_semantic_stack(semantic_stack_t *stack) {
-    stack->arr = (semantic_stack_item_t *)malloc(15 * sizeof(semantic_stack_item_t));
-    stack->arr_size = 15;
-    stack->top = -1;
+void free_semantic_stack(void *stack) {
+    free_linked_list(stack);
 }
 
-void semantic_stack_push(semantic_stack_t *stack, semantic_stack_item_t item) {
-    if (stack->top >= stack->arr_size - 1) {
-        stack->arr_size += 15;
-        stack->arr = (semantic_stack_item_t *)realloc(stack->arr,  stack->arr_size*sizeof(semantic_stack_item_t));
-    }
+/** Returns stack */
+void *parsing_table_get(non_terminal_t non_terminal, token_type_t token) {
+    void *prod = new_stack();
 
-    stack->top += 1;
-    stack->arr[stack->top] = item;
-}
-
-semantic_stack_item_t semantic_stack_pop(semantic_stack_t *stack) {
-    assert(stack->top != -1);
-    semantic_stack_item_t item = stack->arr[stack->top];
-
-    stack->top -= 1;
-    return item;
-}
-
-stack_item_t *parsing_table_get(non_terminal_t non_terminal, token_type_t token) {
     if (non_terminal == Rules && token == Id) {
-        stack_item_t *items = (stack_item_t *)malloc(3 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Rules_Prime);
-        items[1] = create_stack_item_non_terminal(Rule);
-        items[2] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Rule);
+        stack_push_non_terminal(prod, Rules_Prime);
+        return prod;
     }
 
     if (non_terminal == Rules_Prime && token == Id) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Rules);
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Rules);
+        return prod;
     }
 
     if (non_terminal == Rules_Prime && token == Eof) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_epsillon();
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_epsillon(prod);
+        return prod;
     }
 
 
     if (non_terminal == Rule && token == Id) {
-        stack_item_t *items = (stack_item_t *)malloc(5 * sizeof(stack_item_t));
-        items[0] = create_stack_item_terminal(Semicolon);
-        items[1] = create_stack_item_non_terminal(Production);
-        items[2] = create_stack_item_terminal(Arrow);
-        items[3] = create_stack_item_terminal(Id);
-        items[4] = create_stack_item_none();
-        return items;
+        stack_push_termianl(prod, Id);
+        stack_push_termianl(prod, Arrow);
+        stack_push_non_terminal(prod, Production);
+        stack_push_termianl(prod, Semicolon);
+        return prod;
     }
 
     if (non_terminal == Production && (token == Id || token == Terminal || token == Eps)) {
-        stack_item_t *items = (stack_item_t *)malloc(3 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Production_Prime);
-        items[1] = create_stack_item_non_terminal(Item);
-        items[2] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Item);
+        stack_push_non_terminal(prod, Production_Prime);
+        return prod;
     }
 
     if (non_terminal == Production_Prime && (token == Id || token == Terminal || token == Eps)) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_non_terminal(Production);
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_non_terminal(prod, Production);
+        return prod;
     }
 
     if (non_terminal == Production_Prime && token == Semicolon) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_epsillon();
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_epsillon(prod);
+        return prod;
     }
 
     if (non_terminal == Item && (token == Id || token == Terminal || token == Eps)) {
-        stack_item_t *items = (stack_item_t *)malloc(2 * sizeof(stack_item_t));
-        items[0] = create_stack_item_terminal(token);
-        items[1] = create_stack_item_none();
-        return items;
+        stack_push_termianl(prod, token);
+        return prod;
     }
 
-    return NULL;
-}
-
-
-/*
- * Fixes ordering in AST.
- **/
-void AST_reverse(ast_rules_t *ast_root) {
-    size_t start = 0;
-    size_t end = ast_root->length - 1;
-    ast_rule_t tmp_rule;
-
-    while (start < end) {
-        tmp_rule = ast_root->rules[start];
-        ast_root->rules[start] = ast_root->rules[end];
-        ast_root->rules[end] = tmp_rule;
-
-        start += 1;
-        end -= 1;
-    }
-
-    ast_production_t *production;
-    ast_item_t tmp_item;
-
-    for (size_t i = 0; i < ast_root->length; i += 1) {
-        production = ast_root->rules[i].production;
-        start = 0;
-        end = production->length - 1;
-
-        while (start < end) {
-            tmp_item = production->items[start];
-            production->items[start] = production->items[end];
-            production->items[end] = tmp_item;
-
-            start += 1;
-            end -= 1;
-        }
-    }
+    return prod;
 }
 
 void free_AST(ast_rules_t *ast_root) {
     ast_production_t *production;
-    for (size_t i = 0; i < ast_root->length; i += 1) {
-        free(ast_root->rules[i].name);
+    for (size_t i = 0; i < vector_len(ast_root->rules); i += 1) {
+        free_string(ast_root->rules[i].name);
         production = ast_root->rules[i].production;
 
-        for (size_t j = 0; j < production->length; j += 1) {
-            free(production->items[j].value);
+        for (size_t j = 0; j < vector_len(production->items); j += 1) {
+            free_string(production->items[j].value);
         }
 
-        free(production->items);
+        free_vector(production->items);
         free(production);
     }
 
-    free(ast_root->rules);
+    free_vector(ast_root->rules);
     free(ast_root);
 }
 
@@ -546,20 +451,18 @@ ast_rules_t *parse(FILE *source) {
     lexer_t lexer;
     init_lexer(&lexer, source);
 
-    stack_t stack;
-    init_stack(&stack);
+    void *stack = new_stack();
 
-    stack_push(&stack, create_stack_item_terminal(Eof));
-    stack_push(&stack, create_stack_item_non_terminal(Rules));
+    stack_push_termianl(stack, Eof);
+    stack_push_non_terminal(stack, Rules);
 
-    semantic_stack_t semantic_stack;
-    init_semantic_stack(&semantic_stack);
+    void *semantic_stack = new_semantic_stack();
 
     token_t current_token = lexer_next_token(&lexer);
     stack_item_t stack_top;
 
-    while (!stack_is_empty(&stack)) {
-        stack_top = stack_pop(&stack);
+    while (!stack_is_empty(stack)) {
+        stack_top = stack_pop(stack);
         switch (stack_top.type) {
             case TerminalItem: {
                 if (stack_top.terminal != current_token.type) {
@@ -568,7 +471,7 @@ ast_rules_t *parse(FILE *source) {
                 }
 
                 if (current_token.type != Eof) {
-                    semantic_stack_push(&semantic_stack, create_semantic_stack_item_token(current_token));
+                    semantic_stack_push_token(semantic_stack, current_token);
                 }
 
                 current_token = lexer_next_token(&lexer);
@@ -577,111 +480,107 @@ ast_rules_t *parse(FILE *source) {
             }
 
             case NonTerminal: {
-                stack_item_t *production = parsing_table_get(stack_top.non_terminal, current_token.type);
-                if (production == NULL) {
+                void *production = parsing_table_get(stack_top.non_terminal, current_token.type);
+
+                if (stack_is_empty(production)) {
+                    free_stack(production);
+
                     perror("Parsing error 2");
                     exit(1);
                 }
                 
-                stack_push(&stack, create_stack_item_pop(stack_top.non_terminal));
-
-                for (size_t i = 0; production[i].type != None; i += 1) {
-                    stack_push(&stack, production[i]); 
+                stack_push_pop(stack, stack_top.non_terminal);
+                
+                while (!stack_is_empty(production)) {
+                    stack_push(stack, stack_pop(production)); 
                 }
 
-                free(production);
+                free_stack(production);
                 
                 break;
             }
 
             case Epsillon: {
-                semantic_stack_push(&semantic_stack, create_semantic_stak_item_epsillon());
+                semantic_stack_push_epsillion(semantic_stack);
                 break;
             }
 
             case Pop: {
                 switch (stack_top.non_terminal) {
                     case Rules: {
-                        ast_rules_t *rules_prime = (ast_rules_t *)semantic_stack_pop(&semantic_stack).ast_node;
-                        ast_rule_t *rule = (ast_rule_t *)semantic_stack_pop(&semantic_stack).ast_node;
+                        ast_rules_t *rules_prime = (ast_rules_t *)semantic_stack_pop(semantic_stack).ast_node;
+                        ast_rule_t *rule = (ast_rule_t *)semantic_stack_pop(semantic_stack).ast_node;
 
                         ast_rules_t *new_node = (ast_rules_t *)malloc(sizeof(ast_rules_t));
-                        new_node->length = rules_prime->length + 1;
-                        new_node->rules = (ast_rule_t *)realloc(rules_prime->rules, new_node->length * sizeof(ast_rule_t));
 
-                        new_node->rules[new_node->length - 1] = *rule;
+                        new_node->rules = rules_prime->rules;
+                        vector_push_front((void **)&new_node->rules, rule);
+
                         free(rules_prime);
                         free(rule);
 
-                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(&semantic_stack, item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                     case Rules_Prime: {
-                        semantic_stack_item_t item = semantic_stack_pop(&semantic_stack);
+                        semantic_stack_item_t item = semantic_stack_pop(semantic_stack);
 
                         if (item.type == EpsillonToken) {
                             ast_rules_t *new_node = (ast_rules_t *)malloc(sizeof(ast_rules_t));
-                            new_node->length = 0;
-                            new_node->rules = (ast_rule_t *)malloc(0);
+                            new_node->rules = new_vector(sizeof(ast_rule_t), 0);
 
-                            semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
-                            semantic_stack_push(&semantic_stack, new_item);
+                            semantic_stack_push_ast(semantic_stack, new_node);
                             break;
                         }
 
-                        semantic_stack_push(&semantic_stack, item);
+                        semantic_stack_push(semantic_stack, item);
 
                         break;
                     }
                     case Rule: {
-                        semantic_stack_pop(&semantic_stack);
-                        ast_production_t *production = (ast_production_t *)semantic_stack_pop(&semantic_stack).ast_node;
-                        semantic_stack_pop(&semantic_stack);
-                        token_t id = semantic_stack_pop(&semantic_stack).token;
+                        semantic_stack_pop(semantic_stack);
+                        ast_production_t *production = (ast_production_t *)semantic_stack_pop(semantic_stack).ast_node;
+                        semantic_stack_pop(semantic_stack);
+                        token_t id = semantic_stack_pop(semantic_stack).token;
 
                         ast_rule_t *new_node = (ast_rule_t *)malloc(sizeof(ast_rule_t));
                         new_node->name = id.value;
                         new_node->production = production;
 
-                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(&semantic_stack, item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                     case Production: {
-                        ast_production_t *prodution_prime = (ast_production_t *)semantic_stack_pop(&semantic_stack).ast_node;
-                        ast_item_t *item = (ast_item_t *)semantic_stack_pop(&semantic_stack).ast_node;
+                        ast_production_t *prodution_prime = (ast_production_t *)semantic_stack_pop(semantic_stack).ast_node;
+                        ast_item_t *item = (ast_item_t *)semantic_stack_pop(semantic_stack).ast_node;
 
                         ast_production_t *new_node = (ast_production_t *)malloc(sizeof(ast_production_t));
-                        new_node->length = prodution_prime->length + 1;
-                        new_node->items = (ast_item_t *)realloc(prodution_prime->items, new_node->length * sizeof(ast_item_t));
+                        new_node->items = prodution_prime->items;
 
-                        new_node->items[new_node->length - 1] = *item;
+                        vector_push_front((void **)&new_node->items, item);
+
                         free(prodution_prime);
                         free(item);
                         
-                        semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(&semantic_stack, new_item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                     case Production_Prime: {
-                        semantic_stack_item_t item = semantic_stack_pop(&semantic_stack);
+                        semantic_stack_item_t item = semantic_stack_pop(semantic_stack);
 
                         if (item.type == EpsillonToken) {
                             ast_production_t *new_node = (ast_production_t *)malloc(sizeof(ast_production_t));
-                            new_node->length = 0;
-                            new_node->items = (ast_item_t *)malloc(0);
+                            new_node->items = new_vector(sizeof(ast_item_t), 0);
 
-                            semantic_stack_item_t new_item = create_semantic_stak_item_ast(new_node);
-                            semantic_stack_push(&semantic_stack, new_item);
+                            semantic_stack_push_ast(semantic_stack, new_node);
                             break;
                         }
 
-                        semantic_stack_push(&semantic_stack, item);
+                        semantic_stack_push(semantic_stack, item);
                         break;
                     }
                     case Item: {
-                        token_t token = semantic_stack_pop(&semantic_stack).token;
+                        token_t token = semantic_stack_pop(semantic_stack).token;
 
                         ast_item_t *new_node =  (ast_item_t *)malloc(sizeof(ast_item_t));
                         if (token.type == Terminal) {
@@ -699,23 +598,19 @@ ast_rules_t *parse(FILE *source) {
                             new_node->value = NULL;
                         }
 
-                        semantic_stack_item_t item = create_semantic_stak_item_ast(new_node);
-                        semantic_stack_push(&semantic_stack, item);
+                        semantic_stack_push_ast(semantic_stack, new_node);
                         break;
                     }
                 }
                 break;
             }
-
-            case None: break;
         }
     }
 
-    ast_rules_t *ast_root = (ast_rules_t *)semantic_stack_pop(&semantic_stack).ast_node;
-    AST_reverse(ast_root);
+    ast_rules_t *ast_root = (ast_rules_t *)semantic_stack_pop(semantic_stack).ast_node;
 
-    free(stack.arr);
-    free(semantic_stack.arr);
+    free_stack(stack);
+    free_semantic_stack(semantic_stack);
 
     return ast_root;
 }
