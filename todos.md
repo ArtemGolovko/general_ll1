@@ -10,6 +10,24 @@
 - [x] Double linked list
 - [x] String (growable string)
 
+## Grammar fix
+As for the time this text is written, the gram grammar allows invalid LL(1)
+grammars to be parsed.
+
+Examples of borken grammars:
+```
+S -> eps eps;
+S -> A eps;
+S -> eps "a";
+```
+
+If non terminal has an empty production, the its rhs must contain an single
+item of epsillon.
+
+- [ ] Fix gram spec
+- [ ] Fix gram parser
+
+
 ## Stage 2: Analyzer
 - [ ] Construct symbolic table
 - [ ] Convert AST to grammar
