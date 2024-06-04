@@ -21,7 +21,7 @@ S -> A eps;
 S -> eps "a";
 ```
 
-If non terminal has an empty production, the its rhs must contain an single
+If non terminal has an empty production, then its rhs must contain an single
 item of epsillon.
 
 - [ ] Fix gram spec
