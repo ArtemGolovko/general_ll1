@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include "datastructs/string.h"
+
 // Grammar and todo table
 
 typedef enum {
@@ -233,8 +235,116 @@ void Lexer_skip_whitespace_and_comments(Lexer *lexer) {
     }
 }
 
+Token Lexer_capture_invalid(Lexer *lexer) {
+    char c = fgetc(lexer->source);
+    size_t length = 1;
+
+    while (!feof(lexer->source)) {
+        c = fgetc(lexer->source);
+
+        if (isspace(c) || c == EOF || c == '-' || c == ';' || c == '"') {
+            fseek(lexer->source, -1, SEEK_CUR);
+            return new_Token(lexer, T_Invalid, length);
+        }
+
+        length += 1;
+    }
+
+    return new_Token(lexer, T_Invalid, length);
+}
+
+Token Lexer_read_NonTerminal(Lexer *lexer) {
+    char c = fgetc(lexer->source);
+    char *value = new_string(1);
+
+    string_push(&value, c);
+
+    while (!feof(lexer->source) && c != EOF) {
+        c = fgetc(lexer->source);
+        if (!isalpha(c) && c != '_') {
+            break;
+        }
+        
+        string_push(&value, c);
+    }
+
+    fseek(lexer->source, -1, SEEK_CUR);
+
+    return new_Token_with_value(lexer, T_NonTerminal, value);
+}
+
+Token Lexer_read_TerminalLiteral(Lexer *lexer) {
+    char c = 0;
+    bool is_prev_backslash = false;
+    char *value = new_string(0);
+
+    while (!feof(lexer->source) && c != EOF) {
+        c = fgetc(lexer->source);
+
+        if (!is_prev_backslash && c == '"') {
+            return new_Token_with_value(lexer, T_TerminalLiteral, value);
+        }
+
+        is_prev_backslash = c == '\\';
+
+        string_push(&value, c);
+    }
+
+    Token token = new_Token(lexer, T_Invalid, string_len(value));
+    free_string(value);
+
+    return token;
+}
+
 Token Lexer_next_token(Lexer *lexer) {
     Lexer_skip_whitespace_and_comments(lexer);
+
+    if (feof(lexer->source)) {
+        return new_Token(lexer, T_EOF, 0); 
+    }
+
+    char c = fgetc(lexer->source);
+
+    if (c == ';') {
+        return new_Token(lexer, T_Semicolon, 1);
+    }
+
+    if (c == '-') {
+        c = fgetc(lexer->source);
+
+        if (c == '>') {
+            return new_Token(lexer, T_Arrow, 2);
+        }
+        fseek(lexer->source, -1, SEEK_CUR);
+        return Lexer_capture_invalid(lexer);
+    }
+
+    if (c == 'e') {
+        c = fgetc(lexer->source);
+        if (c == 'p') {
+            c = fgetc(lexer->source);
+            if (c == 's') {
+                return new_Token(lexer, T_Eps, 3);
+            }
+
+            fseek(lexer->source, -2, SEEK_CUR);
+            return Lexer_capture_invalid(lexer);
+        }
+
+        fseek(lexer->source, -1, SEEK_CUR);
+        return Lexer_capture_invalid(lexer);
+    }
+
+    if (isalpha(c) && isupper(c)) {
+        fseek(lexer->source, -1, SEEK_CUR);
+        return Lexer_read_NonTerminal(lexer);
+    }
+
+    if (c == '"') {
+        return Lexer_read_TerminalLiteral(lexer);
+    }
+
+    return Lexer_capture_invalid(lexer);
 }
 
 void parse(const char *filename, FILE *source) {
