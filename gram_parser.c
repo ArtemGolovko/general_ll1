@@ -1,9 +1,13 @@
 #include "gram_parser.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <string.h>
+
+// Grammar and todo table
 
 typedef enum {
     Epsillon,
@@ -104,17 +108,17 @@ static const Rule* todo_table[] = {
     NULL,        &grammar[10], NULL, NULL,        &grammar[11], NULL,
 };
 
-bool isNonTerminal(Symbol symbol) {
+bool is_NonTerminal(Symbol symbol) {
     return symbol > Epsillon && symbol < T_Invalid;
 }
 
-bool isTerminal(Symbol symbol) {
+bool is_Terminal(Symbol symbol) {
     return symbol >= T_Invalid;
 }
 
 const Rule *todo_table_get(Symbol nonterm, Symbol term) {
-    assert(isNonTerminal(nonterm));
-    assert(isTerminal(term));
+    assert(is_NonTerminal(nonterm));
+    assert(is_Terminal(term));
 
     if (term == T_Invalid) {
         return NULL;
@@ -124,5 +128,115 @@ const Rule *todo_table_get(Symbol nonterm, Symbol term) {
     return todo_table[index];
 }
 
+// Lexer
+
+typedef struct {
+    const char *filename;
+    FILE *source;
+} Lexer;
+
+typedef struct {
+    Symbol type;
+    size_t pos;
+    size_t length;
+
+    /** string */
+    char *value;
+    const char *filename;
+} Token;
+
+Token new_Token(Lexer *lexer, Symbol type, size_t length) {
+    Token token = {
+        type,
+        ftell(lexer->source) - length,
+        length,
+        NULL,
+        lexer->filename
+    };
+
+    return token;
+}
+
+// Moves ownership of value to the token 
+Token new_Token_with_value(Lexer *lexer, Symbol type, char *value) {
+    size_t length = strlen(value);
+    Token token = {
+        type,
+        ftell(lexer->source) - length,
+        length,
+        value,
+        lexer->filename
+    };
+
+    return token;
+}
+
+Lexer new_Lexer(const char *filename, FILE *source) {
+    Lexer lexer = {
+        filename,
+        source
+    };
+
+    return lexer;
+}
+
+void Lexer_skip_mulitline_comment(Lexer *lexer) {
+    bool is_prev_star = false;
+
+    while (!feof(lexer->source)) {
+        char c = fgetc(lexer->source);
+
+        if (is_prev_star && c == '/') {
+            return;
+        }
+
+        is_prev_star = c == '*';
+    }
+}
+
+void Lexer_skip_singleline_comment(Lexer *lexer) {
+    while (!feof(lexer->source)) {
+        char c = fgetc(lexer->source);
+
+        if (c == '\n') {
+            return;
+        }
+    }
+}
+
+void Lexer_skip_whitespace_and_comments(Lexer *lexer) {
+    while (!feof(lexer->source)) {
+        char c = fgetc(lexer->source);
+
+        if (isspace(c) || c == EOF) {
+            continue;
+        }
+
+        if (c == '/') {
+            c = fgetc(lexer->source);
+            if (c == '*') {
+                Lexer_skip_mulitline_comment(lexer);
+                continue;
+            }
+
+            if (c == '/') {
+                Lexer_skip_singleline_comment(lexer);
+                continue;
+            }
+
+            fseek(lexer->source, -2, SEEK_CUR);
+            return;
+        }
+
+        fseek(lexer->source, -1, SEEK_CUR);
+        return;
+    }
+}
+
+Token Lexer_next_token(Lexer *lexer) {
+    Lexer_skip_whitespace_and_comments(lexer);
+}
+
 void parse(const char *filename, FILE *source) {
+    Lexer lexer = new_Lexer(filename, source);
 }
