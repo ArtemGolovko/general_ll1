@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdbool.h>
+#include <assert.h>
 
 typedef enum {
     Epsillon,
@@ -98,3 +100,32 @@ static const Rule* todo_table[] = {
     NULL,        &grammar[8],  NULL,        &grammar[8],  &grammar[9],
     NULL,        &grammar[10], NULL,        &grammar[11], NULL,
 };
+
+bool isNonTerminal(Symbol symbol) {
+    return symbol > Epsillon && symbol < T_Invalid;
+}
+
+bool isTerminal(Symbol symbol) {
+    return symbol >= T_Invalid;
+}
+
+const Rule *todo_table_get(Symbol nonterm, Symbol term) {
+    assert(isNonTerminal(nonterm));
+    assert(isTerminal(term));
+
+    if (term == T_Invalid) {
+        return NULL;
+    }
+
+    // T_Arrow does not apper on todo table bc it's column is all null 
+    if (term == T_Arrow) {
+        return NULL;
+    }
+
+    if (term > T_Arrow) {
+        term -= 1;
+    }
+    
+    size_t index = (nonterm - NT_Rules) * 5 + (term - T_EOF);
+    return todo_table[index];
+}
