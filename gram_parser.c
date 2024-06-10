@@ -91,14 +91,14 @@ static const Rule grammar[] = {
 };
 
 static const Rule* todo_table[] = {
-    NULL,        &grammar[0],  NULL,        NULL,         NULL,
-    &grammar[2], &grammar[1],  NULL,        NULL,         NULL,
-    NULL,        &grammar[3],  NULL,        NULL,         NULL,
-    NULL,        &grammar[4],  NULL,        NULL,         NULL,
-    NULL,        &grammar[6],  &grammar[5], &grammar[6],  NULL,
-    NULL,        &grammar[7],  NULL,        &grammar[7],  NULL,
-    NULL,        &grammar[8],  NULL,        &grammar[8],  &grammar[9],
-    NULL,        &grammar[10], NULL,        &grammar[11], NULL,
+    NULL,        &grammar[0],  NULL, NULL,        NULL,         NULL,
+    &grammar[2], &grammar[1],  NULL, NULL,        NULL,         NULL,
+    NULL,        &grammar[3],  NULL, NULL,        NULL,         NULL,
+    NULL,        &grammar[4],  NULL, NULL,        NULL,         NULL,
+    NULL,        &grammar[6],  NULL, &grammar[5], &grammar[6],  NULL,
+    NULL,        &grammar[7],  NULL, NULL,        &grammar[7],  NULL,
+    NULL,        &grammar[8],  NULL, NULL,        &grammar[8],  &grammar[9],
+    NULL,        &grammar[10], NULL, NULL,        &grammar[11], NULL,
 };
 
 bool isNonTerminal(Symbol symbol) {
@@ -115,15 +115,6 @@ const Rule *todo_table_get(Symbol nonterm, Symbol term) {
 
     if (term == T_Invalid) {
         return NULL;
-    }
-
-    // T_Arrow does not apper on todo table bc it's column is all null 
-    if (term == T_Arrow) {
-        return NULL;
-    }
-
-    if (term > T_Arrow) {
-        term -= 1;
     }
     
     size_t index = (nonterm - NT_Rules) * 5 + (term - T_EOF);
