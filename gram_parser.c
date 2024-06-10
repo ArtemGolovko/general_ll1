@@ -1,3 +1,6 @@
+#include "gram_parser.h"
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
@@ -119,4 +122,7 @@ const Rule *todo_table_get(Symbol nonterm, Symbol term) {
     
     size_t index = (nonterm - NT_Rules) * 5 + (term - T_EOF);
     return todo_table[index];
+}
+
+void parse(const char *filename, FILE *source) {
 }
