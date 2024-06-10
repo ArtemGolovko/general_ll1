@@ -346,7 +346,46 @@ Token Lexer_next_token(Lexer *lexer) {
 
     return Lexer_capture_invalid(lexer);
 }
+// Debug
+
+const char *Symbol_to_string(Symbol symbol) {
+    switch (symbol) {
+        case Epsillon: return "Epsillon";
+        case NT_Rules: return "NT_Rules";
+        case NT_RulesPrime: return "NT_RulesPrime";
+        case NT_Rule: return "NT_Rule";
+        case NT_LHS: return "NT_LHS";
+        case NT_RHS: return "NT_RHS";
+        case NT_Items: return "NT_Items";
+        case NT_ItemsPrime: return "NT_ItemsPrime";
+        case NT_Item: return "NT_Item";
+        case T_Invalid: return "T_Invalid";
+        case T_EOF: return "T_EOF";
+        case T_NonTerminal: return "T_NonTerminal";
+        case T_Arrow: return "T_Arrow";
+        case T_Eps: return "T_Eps";
+        case T_TerminalLiteral: return "T_TerminalLiteral";
+        case T_Semicolon: return "T_Semicolon";
+    }
+}
+
+void Token_print(Token *token) {
+    printf("Token of type %s at poition %zd with ", Symbol_to_string(token->type), token->pos);
+    if (token->value != NULL) {
+        printf("value: %s", token->value);
+    } else {
+        printf("no value");
+    }
+    printf(". Length: %zd.\n", token->length);
+}
 
 void parse(const char *filename, FILE *source) {
     Lexer lexer = new_Lexer(filename, source);
+    Token token = { 0 };
+
+    while (token.type != T_EOF) {
+        token = Lexer_next_token(&lexer);
+        Token_print(&token);
+        free_string(token.value);
+    }
 }
