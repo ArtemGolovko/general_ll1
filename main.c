@@ -17,10 +17,17 @@ int main(int argc, char **argv) {
     }
 
     printf("Parsing...\n");
-    parse(filename, file);
-    printf("parsing success");
+
+    bool accepted = parse(filename, file);
+
+    if (accepted) {
+        printf("parsing success\n");
+    } else {
+        printf("parsing failed\n");
+    }
 
 
     fclose(file);
+
     return 0;
 }

@@ -16,8 +16,8 @@
 - Error recovery
 
 - [x] Symbols, Grammar, Todo Table
-- [ ] Lexer
-- [ ] Parser
+- [x] Lexer
+- [x] Parser
 - [ ] AST
 - [ ] Panic mode error recovery
 - [ ] Parsing level error recovery (Maybe)
