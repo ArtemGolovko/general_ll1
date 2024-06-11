@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdbool.h>
 
-void parse(const char *filename, FILE *source);
+bool parse(const char *filename, FILE *source);
 
