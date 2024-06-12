@@ -521,6 +521,8 @@ bool parse(const char *filename, FILE *source) {
                 display_not_matching_terminal_error(&lexer, top.type, &token);
 
                 stack_push(stack, top.type);
+                token = Lexer_next_token(&lexer);
+                continue;
             }
 
             
@@ -537,6 +539,7 @@ bool parse(const char *filename, FILE *source) {
 
                 stack_push(stack, top.type);
                 token = Lexer_next_token(&lexer);
+                continue;
             }
 
             for (size_t i = rule->rhs_length; i > 0; i -= 1) {
