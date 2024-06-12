@@ -151,7 +151,7 @@ typedef struct {
 Token new_Token(Lexer *lexer, Symbol type, size_t length) {
     Token token = {
         type,
-        ftell(lexer->source) - length - 1,
+        ftell(lexer->source) - length,
         length,
         NULL,
     };
@@ -164,7 +164,7 @@ Token new_Token_with_value(Lexer *lexer, Symbol type, char *value) {
     size_t length = strlen(value);
     Token token = {
         type,
-        ftell(lexer->source) - length - 1,
+        ftell(lexer->source) - length,
         length,
         value,
     };
@@ -463,7 +463,7 @@ void display_error(Error *error) {
 
     fprintf(stderr, " | ");
     
-    for (size_t i = 0; i < col; i += 1) {
+    for (size_t i = 0; i < col - 1; i += 1) {
         fprintf(stderr, " ");
     }
 
