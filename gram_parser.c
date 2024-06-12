@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 #include "datastructs/string.h"
 #include "datastructs/linked_list.h"
@@ -145,16 +146,14 @@ typedef struct {
 
     /** string */
     char *value;
-    const char *filename;
 } Token;
 
 Token new_Token(Lexer *lexer, Symbol type, size_t length) {
     Token token = {
         type,
-        ftell(lexer->source) - length,
+        ftell(lexer->source) - length - 1,
         length,
         NULL,
-        lexer->filename
     };
 
     return token;
@@ -165,10 +164,9 @@ Token new_Token_with_value(Lexer *lexer, Symbol type, char *value) {
     size_t length = strlen(value);
     Token token = {
         type,
-        ftell(lexer->source) - length,
+        ftell(lexer->source) - length - 1,
         length,
         value,
-        lexer->filename
     };
 
     return token;
@@ -402,12 +400,106 @@ StackItem stack_pop(void *stack) {
 bool stack_is_empty(void *stack) {
     return linked_list_len(stack) == 0;
 }
+// displaying errors
 
-void display_not_matching_terminal_error(Symbol top, Token *token) {
-    perror("display_not_matching_terminal_error\n");
+typedef struct {
+    size_t pos;
+    size_t length;
+    const char *message;
+    const char *filename;
+    FILE *file;
+} Error;
+
+void display_error(Error *error) {
+    size_t og_pos = ftell(error->file);
+    rewind(error->file);
+
+    size_t pos = 0;
+    size_t row = 1;
+    size_t col = 1;
+    size_t nl = 0;
+
+    while (pos < error->pos && !feof(error->file)) {
+        char c = fgetc(error->file);
+        pos += 1;
+
+        if (c == '\n') {
+            nl = pos;
+            row += 1;
+            col = 1;
+            continue;
+        }
+
+        col += 1;
+    }
+    
+    col -= error->length;
+    // fprintf(stderr, "Row: %zd, Col: %zd, NL: %zd\n", row, col, nl);
+
+    char *line = new_string(pos - nl);
+    fseek(error->file, nl + 2, SEEK_SET);
+    
+    char c = fgetc(error->file);
+    while (c != '\n' && c != EOF && !feof(error->file)) {
+        string_push(&line, c);
+
+        c = fgetc(error->file);
+    }
+
+    size_t tab_length = floor(log10(row)) + 1 ;
+    // fprintf(stderr, "Line: |%s|\n", line);
+
+    fprintf(stderr, "%s:%zd:%zd\n", error->filename, row, col);
+
+    for (size_t i = 0; i < tab_length; i += 1) {
+        fprintf(stderr, " ");
+    }
+
+    fprintf(stderr, " |\n%zd | %s\n", row, line);
+
+    for (size_t i = 0; i < tab_length; i += 1) {
+        fprintf(stderr, " ");
+    }
+
+    fprintf(stderr, " | ");
+    
+    for (size_t i = 0; i < col; i += 1) {
+        fprintf(stderr, " ");
+    }
+
+    for (size_t i = 0; i < error->length; i += 1) {
+        fprintf(stderr, "^");
+    }
+
+    fprintf(stderr, " %s\n", error->message);
+    
+    fseek(error->file, og_pos, SEEK_SET);
 }
-void display_not_matching_rule_error(Symbol top, Token *token) {
-    perror("display_not_matching_rule_error\n");
+
+void display_not_matching_terminal_error(Lexer *lexer, Symbol top, Token *token) {
+    char *message = "display_not_matching_terminal_error";
+    Error error = {
+        token->pos,
+        token->length,
+        message,
+        lexer->filename,
+        lexer->source
+    };
+
+    display_error(&error);
+}
+
+void display_not_matching_rule_error(Lexer *lexer, Symbol top, Token *token) {
+    char *message = "display_not_matching_rule_error";
+    Error error = {
+        token->pos,
+        token->length,
+        message,
+        lexer->filename,
+        lexer->source
+    };
+
+    display_error(&error);
 }
 
 bool parse(const char *filename, FILE *source) {
@@ -426,7 +518,7 @@ bool parse(const char *filename, FILE *source) {
         if (is_Terminal(top.type)) {
             if (top.type != token.type) {
                 accepted = false;
-                display_not_matching_terminal_error(top.type, &token);
+                display_not_matching_terminal_error(&lexer, top.type, &token);
 
                 stack_push(stack, top.type);
             }
@@ -441,7 +533,7 @@ bool parse(const char *filename, FILE *source) {
             
             if (rule == NULL) {
                 accepted = false;
-                display_not_matching_rule_error(top.type, &token);
+                display_not_matching_rule_error(&lexer, top.type, &token);
 
                 stack_push(stack, top.type);
                 token = Lexer_next_token(&lexer);
