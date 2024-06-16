@@ -241,7 +241,14 @@ Token Lexer_capture_invalid(Lexer *lexer) {
     while (!feof(lexer->source)) {
         c = fgetc(lexer->source);
 
-        if (isspace(c) || c == EOF || c == '-' || c == ';' || c == '"') {
+        if (
+               isspace(c) 
+            || c == EOF
+            || c == '-'
+            || c == ';'
+            || c == '"'
+            || (isalpha(c) && isupper(c))
+        ) {
             fseek(lexer->source, -1, SEEK_CUR);
             return new_Token(lexer, T_Invalid, length);
         }
@@ -267,9 +274,10 @@ Token Lexer_read_NonTerminal(Lexer *lexer) {
         string_push(&value, c);
     }
 
+    Token token = new_Token_with_value(lexer, T_NonTerminal, value);
     fseek(lexer->source, -1, SEEK_CUR);
 
-    return new_Token_with_value(lexer, T_NonTerminal, value);
+    return token;
 }
 
 Token Lexer_read_TerminalLiteral(Lexer *lexer) {
@@ -312,7 +320,9 @@ Token Lexer_next_token(Lexer *lexer) {
         c = fgetc(lexer->source);
 
         if (c == '>') {
-            return new_Token(lexer, T_Arrow, 2);
+            Token token = new_Token(lexer, T_Arrow, 2);
+            token.pos -= 1; 
+            return token;
         }
         fseek(lexer->source, -1, SEEK_CUR);
         return Lexer_capture_invalid(lexer);
@@ -343,6 +353,7 @@ Token Lexer_next_token(Lexer *lexer) {
         return Lexer_read_TerminalLiteral(lexer);
     }
 
+    fseek(lexer->source, -1, SEEK_CUR);
     return Lexer_capture_invalid(lexer);
 }
 // Debug
@@ -416,7 +427,6 @@ void display_error(Error *error) {
 
     size_t pos = 0;
     size_t row = 1;
-    size_t col = 1;
     size_t nl = 0;
 
     while (pos < error->pos && !feof(error->file)) {
@@ -426,18 +436,20 @@ void display_error(Error *error) {
         if (c == '\n') {
             nl = pos;
             row += 1;
-            col = 1;
             continue;
         }
-
-        col += 1;
     }
-    
-    col -= error->length;
+
+    size_t col = pos - nl;
     // fprintf(stderr, "Row: %zd, Col: %zd, NL: %zd\n", row, col, nl);
 
-    char *line = new_string(pos - nl);
-    fseek(error->file, nl + 2, SEEK_SET);
+    char *line = new_string(col);
+    if (nl == 0) {
+        fseek(error->file, nl, SEEK_SET);
+    } else {
+
+        fseek(error->file, nl + 2, SEEK_SET);
+    }
     
     char c = fgetc(error->file);
     while (c != '\n' && c != EOF && !feof(error->file)) {
@@ -471,7 +483,7 @@ void display_error(Error *error) {
         fprintf(stderr, "^");
     }
 
-    fprintf(stderr, " %s\n", error->message);
+    fprintf(stderr, " %s\n\n", error->message);
     
     fseek(error->file, og_pos, SEEK_SET);
 }

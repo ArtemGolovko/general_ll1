@@ -1,4 +1,4 @@
-Expr -> Term ExprPrime;
+Expr Expr -> Term ExprPrime;
 ExprPrime -> "+" Expr
 ExprPrime -> "-" Expr;
 ExprPrime -> eps;

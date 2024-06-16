@@ -17,6 +17,7 @@
 
 - [x] Symbols, Grammar, Todo Table
 - [x] Lexer
+- [ ] Remake lexer (current version is too bugged)
 - [x] Parser
 - [ ] AST
 - [ ] Panic mode error recovery
