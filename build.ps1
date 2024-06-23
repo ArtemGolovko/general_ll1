@@ -19,7 +19,6 @@ echo $SOURCE_FILES
 # Push-Location $BULID_DIR
 cd $BUILD_DIR
 
-Get-Location | echo
 cl.exe $CL_OPTIONS $SOURCE_FILES /link $LINK_OPTIONS
 
 # Pop-Location

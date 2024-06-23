@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TargetConfig Name="C:\Users\Artem\projects\general_ll1\build\general_ll1.exe" LastUsed="2024-06-23T14:30:05.0259941Z">
+  <EngineConfig />
+  <EngineOptions>
+    <Property name="DebugChildProcesses" value="false" />
+    <Property name="StartDirectory" value="C:\Users\Artem\projects\general_ll1" />
+  </EngineOptions>
+  <TargetOptions>
+    <Option name="LaunchProcess">
+      <Property name="Executable" value="C:\Users\Artem\projects\general_ll1\build\general_ll1.exe" />
+      <Property name="Arguments" value=".\test\math_broken.gram" />
+    </Option>
+  </TargetOptions>
+</TargetConfig>

@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <excpt.h>
 #include "gram_parser.h"
+
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -15,17 +17,19 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Failed to open file '%s', error code %d.\n", filename, error);
         return 1;
     }
+    __try { 
+        printf("Parsing...\n");
 
-    printf("Parsing...\n");
+        bool accepted = parse(filename, file);
 
-    bool accepted = parse(filename, file);
-
-    if (accepted) {
-        printf("parsing success\n");
-    } else {
-        printf("parsing failed\n");
+        if (accepted) {
+            printf("parsing success\n");
+        } else {
+            printf("parsing failed\n");
+        }
+    }  __except(-1) {
+        perror("Segmentaion fault\n");
     }
-
 
     fclose(file);
 
