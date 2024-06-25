@@ -1,5 +1,6 @@
 #include "string.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -75,4 +76,21 @@ void string_push(char **string, char item) {
     begin[metadata->length + 1] = '\0';
 
     metadata->length += 1;
+}
+
+char string_pop(char **string) {
+    string_metadata_t *metadata = get_string_metadata(*string);
+    assert(metadata->length > 0);
+
+    char c = (*string)[0];
+
+    metadata->length -= 1;
+
+    if (metadata->length != 0) {
+        memmove((*string), (*string) + 1, metadata->length);
+    }
+
+    (*string)[metadata->length + 1] = '\0';
+
+    return c;
 }

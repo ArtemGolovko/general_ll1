@@ -1,7 +1,7 @@
 $PROJECT_DIR = $pwd.Path
 $BUILD_DIR = "$pwd\build"
 
-$CL_OPTIONS = "/TC", "/Zi"
+$CL_OPTIONS = "/TC", "/Zi", "/fsanitize=address", "/sdl"
 $LINK_OPTIONS = "/out:general_ll1.exe"
 
 $SearchOptions = @{
