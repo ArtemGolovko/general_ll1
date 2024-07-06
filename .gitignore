@@ -3,5 +3,5 @@
 *.ilk
 *.pdb
 
-build/*
-!build/.gitkeep
+out/*
+!out/.gitkeep

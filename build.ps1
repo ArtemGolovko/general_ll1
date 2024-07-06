@@ -1,26 +1,45 @@
-$PROJECT_DIR = $pwd.Path
-$BUILD_DIR = "$pwd\build"
+$project_root = Split-Path -Path $MyInvocation.MyCommand.Path
+$project_build = "$project_root/out"
+$project_bin = "$project_build/bin"
 
-$CL_OPTIONS = "/TC", "/Zi", "/fsanitize=address", "/sdl"
-$LINK_OPTIONS = "/out:general_ll1.exe"
+#build step
 
-$SearchOptions = @{
-    Path        = $PROJECT_DIR 
-    Filter      = '*.c'
-    Recurse     = $true
-    ErrorAction = 'SilentlyContinue'
-    Force       = $true
+cmake -S $project_root -B $project_build -G "NMake Makefiles"
+
+Push-Location $project_build
+
+nmake
+
+Pop-Location
+
+$action = $args[0]
+
+if ($action -eq "run") {
+    $rest_args = @()
+
+    $rest_index = [array]::indexof($args, "/args")
+    if ($rest_index -ne -1) {
+        $rest_args = $args[($rest_index + 1) .. $args.Length]
+    }
+
+    echo ""
+    echo "& ""$project_bin/general_ll1.exe"" $rest_args"
+
+    & "$project_bin/general_ll1.exe" @rest_args
 }
 
-$SOURCE_FILES = Get-ChildItem @SearchOptions | Where-Object Name -NotMatch '_test.c$' | %{$_.FullName}
+if ($action -eq "test") {
+    $rest_args = @()
 
-echo $SOURCE_FILES
+    $rest_index = [array]::indexof($args, "/args")
+    if ($rest_index -ne -1) {
+        $rest_args = $args[($rest_index + 1) .. $args.Length]
+    }
 
-# Push-Location $BULID_DIR
-cd $BUILD_DIR
+    Push-Location $project_build
+    
+    echo ""
+    ctest @rest_args
 
-cl.exe $CL_OPTIONS $SOURCE_FILES /link $LINK_OPTIONS
-
-# Pop-Location
-cd $PROJECT_DIR
-
+    Pop-Location
+}
