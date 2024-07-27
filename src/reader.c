@@ -7,34 +7,43 @@ Reader new_Reader(FILE *file) {
     Reader reader = {
         file,
         0,
-        false,
         new_string(3),
     };
 
     return reader;
 }
 
-
+void free_Reader(Reader *reader) {
+    free_string(reader->buffer);
+}
 char Reader_peek(Reader *reader, size_t n) {
     assert(n > 0);
-
-    if (reader->eof) {
+    
+    if (n <= string_len(reader->buffer)) {
+        return reader->buffer[n - 1];
+    }
+    
+    if (feof(reader->file)) {
         return EOF;
     }
 
-    size_t number_of_characters_to_get = string_len(reader->buffer) - n;
+    size_t buffer_characters = n - string_len(reader->buffer);
 
-    for (size_t i = 0; i < number_of_characters_to_get; i += 1) {
+    for (size_t i = 0; i < buffer_characters; i += 1) {
         char c = fgetc(reader->file);
 
-        if (c == '\0') {
-            c = EOF;
+        if (c == EOF || c == 0) {
+            break;
         }
 
         string_push(&reader->buffer, c);
     }
 
-    return reader->buffer[n - 1]; 
+    if (n <= string_len(reader->buffer)) {
+        return reader->buffer[n - 1];
+    }
+    
+    return EOF;
 }
 
 void Reader_consume(Reader *reader, size_t n) {

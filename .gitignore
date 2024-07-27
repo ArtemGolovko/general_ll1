@@ -4,4 +4,5 @@
 *.pdb
 
 out/*
+out2
 !out/.gitkeep

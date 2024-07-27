@@ -69,7 +69,7 @@ START_TEST(vector_test_push_front_method)
 }
 END_TEST
 
-Suite *vector_suite() {
+Suite *reader_suite() {
     Suite *suite = suite_create("Vector Tests");
 
     TCase *esentials = tcase_create("Esentials");
@@ -85,7 +85,7 @@ Suite *vector_suite() {
 
  int main()
  {
-    Suite *suite = vector_suite(); 
+    Suite *suite = reader_suite(); 
     SRunner *srunner = srunner_create(suite);
 
     srunner_run_all(srunner, CK_NORMAL);

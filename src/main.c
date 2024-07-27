@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <excpt.h>
 #include "gram_parser.h"
-
+#include "read_file_to_string.h"
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -10,6 +10,11 @@ int main(int argc, char **argv) {
     }
 
     char* filename = argv[1];
+
+    ReadInfo info = read_file_to_string(filename); 
+
+    printf("Size: %d\nContent:\n%.*s\n", info.length, info.length, info.buffer);
+
     FILE* file;
     int error = fopen_s(&file, filename, "r");
 
