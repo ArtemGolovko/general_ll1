@@ -1,18 +1,23 @@
 $project_root = Split-Path -Path $MyInvocation.MyCommand.Path
+$project_name = "general_ll1"
 $project_build = "$project_root/out"
 $project_bin = "$project_build/bin"
+$project_config = "Debug"
 
 #build step
 
-cmake -S $project_root -B $project_build -G "NMake Makefiles"
-
-Push-Location $project_build
-
-nmake
-
-Pop-Location
-
 $action = $args[0]
+
+if ($action -eq "build") {
+    cmake -S $project_root -B $project_build 
+
+    Push-Location $project_build
+
+    msbuild "$project_name.sln"
+
+    Pop-Location
+}
+
 
 if ($action -eq "run") {
     $rest_args = @()
@@ -23,9 +28,9 @@ if ($action -eq "run") {
     }
 
     echo ""
-    echo "& ""$project_bin/general_ll1.exe"" $rest_args"
+    echo "& ""$project_bin/$project_config/$project_name.exe"" $rest_args"
 
-    & "$project_bin/general_ll1.exe" @rest_args
+    & "$project_bin/$project_config/$project_name.exe" @rest_args
 }
 
 if ($action -eq "test") {
@@ -39,7 +44,7 @@ if ($action -eq "test") {
     Push-Location $project_build
     
     echo ""
-    ctest @rest_args
+    ctest -C $project_config @rest_args
 
     Pop-Location
 }
