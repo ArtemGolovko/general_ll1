@@ -10,7 +10,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_compile_options(/TC /Zi /fsanitize=address)
+
 include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/vendor/Check/include)
 
 file(GLOB_RECURSE LIB_SOURCES  ${PROJECT_SOURCE_DIR}/src/*.c)
 list(FILTER LIB_SOURCES EXCLUDE REGEX "main")

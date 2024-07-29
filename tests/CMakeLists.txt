@@ -1,5 +1,9 @@
 if (BUILD_TESTING)
-    find_library(CHECK_LIB check)
+    find_library(
+        CHECK_LIB check
+        PATHS ${PROJECT_SOURCE_DIR}/vendor/Check/lib 
+    )
+
     if (NOT CHECK_LIB)
         message(FATAL_ERROR "Check library not found")
     endif()
