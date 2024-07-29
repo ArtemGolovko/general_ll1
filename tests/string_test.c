@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "../src/datastructs/string.h"
+#include "datastructs/string.h"
 
 
 START_TEST(string_test)
