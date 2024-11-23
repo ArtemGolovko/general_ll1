@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <time.h>
 #include "datastructs/string.h"
+#include "gram_parser/error.h"
 #include "gram_parser/grammar.h"
 
 Lexer new_Lexer(const char *filename, const char *source, size_t source_length) {
@@ -100,7 +101,7 @@ void Lexer_skip_singleline_comment(Lexer *lexer) {
         Lexer_pos_inc(lexer);
     }
 }
-// TODO: Check EOF
+
 void Lexer_skip_whitespace_and_comments(Lexer *lexer) {
     char c;
     while (Lexer_in_bounds(lexer)) {
@@ -137,6 +138,55 @@ void Lexer_skip_whitespace_and_comments(Lexer *lexer) {
 
 }
 
+bool is_allowed_after_NonTerminal(char c) {
+    return isspace(c)
+        || c == '/'
+        || c == '-'
+        || c == ';'
+        || c == '"';
+}
+
+Token Lexer_capture_Invalid(Lexer *lexer, unsigned int skip) {
+    int len = skip;
+    Location loc = lexer->loc;
+
+    Lexer_pos_inc_n(lexer, skip);
+    char c;
+
+
+    while (Lexer_in_bounds(lexer)) {
+        c = Lexer_ch(lexer);
+
+        if (is_allowed_after_NonTerminal(c)) {
+            break;
+        }
+
+        len += 1;
+        Lexer_pos_inc(lexer);
+    }
+
+
+    SyntaxError last_error = {
+        LexerError,
+        strdup("Invalid token"),
+        len,
+        loc,
+        lexer->source,
+        lexer->source_length
+    };
+
+    lexer->last_error = last_error;
+
+    Token token = {
+        T_Invalid,
+        len,
+        loc,
+        NULL
+    };
+
+    return token;
+}
+
 Token Lexer_read_NonTerminal(Lexer *lexer) {
     Location loc = lexer->loc;
 
@@ -152,6 +202,14 @@ Token Lexer_read_NonTerminal(Lexer *lexer) {
 
         string_push(&value, c);
         Lexer_pos_inc(lexer);
+    }
+
+    if (!is_allowed_after_NonTerminal(c)) {
+        lexer->loc = loc;
+        int skip = string_len(value);
+        free_string(value);
+
+        return Lexer_capture_Invalid(lexer, skip);
     }
 
     Token token = {
@@ -210,6 +268,20 @@ Token Lexer_read_TerminalLiteral(Lexer *lexer) {
         Lexer_pos_inc(lexer);
     }
     
+    free_string(value);
+
+    SyntaxError last_error = {
+        LexerError,
+        strdup("Unexpected end of file"),
+        len,
+        loc,
+        lexer->source,
+        lexer->source_length
+    };
+
+    lexer->last_error = last_error;
+
+
     Token token = {
         T_Invalid,
         len,
@@ -264,8 +336,11 @@ Token Lexer_next_token(Lexer *lexer) {
 
     if (c == 'e'
         && Lexer_peek(lexer, 1) == 'p'
-        && Lexer_peek(lexer, 2) == 's'
-        /*&& !isalnum(Lexer_peek(lexer, 3))*/) { //TODO: Add helper is allowed after NonTerminal
+        && Lexer_peek(lexer, 2) == 's') {
+
+        if (!is_allowed_after_NonTerminal(Lexer_peek(lexer, 3))) {
+            return Lexer_capture_Invalid(lexer, 3);
+        }
 
         Token token = {
             T_Eps,
@@ -287,12 +362,9 @@ Token Lexer_next_token(Lexer *lexer) {
         return Lexer_read_TerminalLiteral(lexer);
     }
     
-    Token token = {
-        T_Invalid,
-        0,
-        lexer->loc,
-        NULL,
-    };
+    return Lexer_capture_Invalid(lexer, 0);
+}
 
-    return token;
+SyntaxError Lexer_get_last_error(Lexer *lexer) {
+    return lexer->last_error;
 }

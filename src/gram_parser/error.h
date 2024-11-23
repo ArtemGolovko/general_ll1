@@ -1,9 +1,23 @@
 #pragma once
 
-#include "grammar.h"
-#include "lexer.h"
+#include "location.h"
 
+typedef enum {
+    LexerError,
+    ParserError
+} SyntaxErrorOrigin;
 
-void display_not_matching_terminal_error(Lexer *lexer, Symbol top, Token *token);
+typedef struct {
+    SyntaxErrorOrigin origin;
 
-void display_not_matching_rule_error(Lexer *lexer, Symbol top, Token *token);
+    char *message;
+
+    unsigned int token_length;
+    Location loc;
+
+    const char *source;
+    int source_length;
+} SyntaxError;
+
+void free_SyntaxError(SyntaxError *error);
+
