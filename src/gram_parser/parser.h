@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
 #include <stdbool.h>
 
-bool parse(const char *filename, FILE *source);
+bool parse(const char *filename, const char *source, size_t source_length);
+void test_lexer(const char *filename, const char *source, size_t source_length);

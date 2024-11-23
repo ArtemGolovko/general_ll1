@@ -4,6 +4,7 @@
 typedef struct {
     char *buffer;
     size_t length;
+    int error;
 } ReadInfo;
 
 

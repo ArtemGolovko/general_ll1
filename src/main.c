@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <excpt.h>
 #include "gram_parser.h"
+#include "gram_parser/parser.h"
 #include "read_file_to_string.h"
 
 int main(int argc, char **argv) {
@@ -12,31 +14,33 @@ int main(int argc, char **argv) {
     char* filename = argv[1];
 
     ReadInfo info = read_file_to_string(filename); 
+    
+    if (info.error != 0) {
+        free(info.buffer);
+        fprintf(stderr, "Failed to open file '%s', error code %d.\n", filename, info.error);
+
+        return 1;
+    }
 
     printf("Size: %d\nContent:\n%.*s\n", info.length, info.length, info.buffer);
 
-    FILE* file;
-    int error = fopen_s(&file, filename, "r");
-
-    if (error != 0) {
-        fprintf(stderr, "Failed to open file '%s', error code %d.\n", filename, error);
-        return 1;
-    }
     __try { 
         printf("Parsing...\n");
 
-        bool accepted = parse(filename, file);
+        test_lexer(filename, info.buffer, info.length);
 
-        if (accepted) {
-            printf("parsing success\n");
-        } else {
-            printf("parsing failed\n");
-        }
+        // bool accepted = parse(filename, info.buffer, info.length);
+        //
+        // if (accepted) {
+        //     printf("parsing success\n");
+        // } else {
+        //     printf("parsing failed\n");
+        // }
     }  __except(-1) {
         perror("Segmentaion fault\n");
     }
 
-    fclose(file);
+    free(info.buffer);
 
     return 0;
 }

@@ -3,7 +3,20 @@
 #include "grammar.h"
 #include "lexer.h"
 #include "error.h"
-#include "../datastructs/linked_list.h"
+#include "datastructs/linked_list.h"
+
+#include <stdio.h>
+
+void test_lexer(const char *filename, const char *source, size_t source_length) {
+    Lexer lexer = new_Lexer(filename, source, source_length);
+    Token token;
+    while ((token = Lexer_next_token(&lexer)), token.type != T_EOF) {
+        printf("%s(%s, len: %d, pos: %d[%d:%d])\n", Symbol_to_string(token.type), token.value, token.length, token.loc.pos, token.loc.row, token.loc.col);
+        free(token.value);
+    }
+    printf("%s(%s, len: %d, pos: %d[%d:%d])\n", Symbol_to_string(token.type), token.value, token.length, token.loc.pos, token.loc.row, token.loc.col);
+    free(token.value);
+}
 
 typedef struct {
     Symbol type;
@@ -28,8 +41,8 @@ bool stack_is_empty(void *stack) {
     return linked_list_len(stack) == 0;
 }
 
-bool parse(const char *filename, FILE *source) {
-    Lexer lexer = new_Lexer(filename, source);
+bool parse(const char *filename, const char *source, size_t source_length) {
+    Lexer lexer = new_Lexer(filename, source, source_length);
     void *stack = new_linked_list(sizeof(StackItem));
     
     stack_push(stack, T_EOF);

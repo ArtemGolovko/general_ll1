@@ -8,6 +8,7 @@
 ReadInfo read_file_to_string(const char *filename) {
     ReadInfo info = {
         malloc(sizeof(char) * CHUNK_SIZE),
+        0,
         0
     };
     
@@ -15,7 +16,12 @@ ReadInfo read_file_to_string(const char *filename) {
     size_t buffer_size = 1;
     size_t chunks_read = 0;
     
-    FILE *file = fopen(filename, "r");
+    FILE *file;
+    info.error = fopen_s(&file, filename, "r");
+
+    if (info.error != 0) {
+        return info;
+    }
 
     while (!feof(file)) {
         if (chunks_read >= buffer_size) {
