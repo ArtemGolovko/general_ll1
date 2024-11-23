@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include "datastructs/string.h"
 #include "grammar.h"
 #include "lexer.h"
 #include "error.h"
@@ -12,7 +13,7 @@ void test_lexer(const char *filename, const char *source, size_t source_length) 
     Token token;
     while ((token = Lexer_next_token(&lexer)), token.type != T_EOF) {
         printf("%s(%s, len: %d, pos: %d[%d:%d])\n", Symbol_to_string(token.type), token.value, token.length, token.loc.pos, token.loc.row, token.loc.col);
-        free(token.value);
+        free_string(token.value);
     }
     printf("%s(%s, len: %d, pos: %d[%d:%d])\n", Symbol_to_string(token.type), token.value, token.length, token.loc.pos, token.loc.row, token.loc.col);
     free(token.value);

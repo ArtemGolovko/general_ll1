@@ -1,5 +1,3 @@
-
-// Singleline comment
 ExprPrime -> "+" Expr;
 ExprPrime -> "-" Expr;
 ExprPrime -> eps;
