@@ -20,7 +20,6 @@ Lexer new_Lexer(const char *filename, const char *source, size_t source_length) 
         source,
         source_length,
         loc,
-        0
     };
 
     return lexer;
@@ -40,7 +39,6 @@ void Lexer_pos_inc_n(Lexer *lexer, unsigned int n) {
     lexer->loc.col += n;
 }
 void Lexer_pos_inc_nl(Lexer *lexer) {
-    lexer->ln_pos = lexer->loc.pos;
     lexer->loc.pos += 1;
     lexer->loc.row += 1;
     lexer->loc.col = 1;
