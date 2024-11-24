@@ -19,5 +19,7 @@ typedef struct {
     int source_length;
 } SyntaxError;
 
+void SyntaxError_display(SyntaxError *error);
+
 void free_SyntaxError(SyntaxError *error);
 

@@ -16,7 +16,7 @@ void test_lexer(const char *filename, const char *source, size_t source_length) 
         free_string(token.value);
         if (token.type == T_Invalid) {
             SyntaxError last_error = Lexer_get_last_error(&lexer);
-            printf("Error [Lexer]: %s\n", last_error.message);
+            SyntaxError_display(&last_error);
             free_SyntaxError(&last_error);
         }
     }
