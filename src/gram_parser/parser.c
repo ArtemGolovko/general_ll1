@@ -100,6 +100,10 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
             const Rule *rule = todo_table_get(top.type, token.type);
             
             if (rule == NULL) {
+                if (token.type == T_Invalid) {
+                    vector_push((void **)&errors, &lexer.last_error);
+                }
+
                 SyntaxError error = create_not_matching_rule_error(&token, &lexer);
                 vector_push((void **)&errors, &error);
 
