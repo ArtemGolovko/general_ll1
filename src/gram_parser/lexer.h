@@ -29,5 +29,3 @@ Lexer new_Lexer(const char *filename, const char *source, size_t source_length);
 
 
 Token Lexer_next_token(Lexer *lexer);
-
-SyntaxError Lexer_get_last_error(Lexer *lexer);

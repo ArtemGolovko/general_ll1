@@ -1,28 +1,16 @@
 #include "parser.h"
 
-#include "datastructs/string.h"
-#include "gram_parser/error.h"
+#include <string.h>
+
 #include "grammar.h"
 #include "lexer.h"
+#include "gram_parser/error.h"
+
+#include "datastructs/string.h"
+#include "datastructs/vector.h"
 #include "datastructs/linked_list.h"
 
-#include <stdio.h>
 
-void test_lexer(const char *filename, const char *source, size_t source_length) {
-    Lexer lexer = new_Lexer(filename, source, source_length);
-    Token token;
-    while ((token = Lexer_next_token(&lexer)), token.type != T_EOF) {
-        printf("%s(%s, len: %d, pos: %d[%d:%d])\n", Symbol_to_string(token.type), token.value, token.length, token.loc.pos, token.loc.row, token.loc.col);
-        free_string(token.value);
-        if (token.type == T_Invalid) {
-            SyntaxError last_error = Lexer_get_last_error(&lexer);
-            SyntaxError_display(&last_error);
-            free_SyntaxError(&last_error);
-        }
-    }
-    printf("%s(%s, len: %d, pos: %d[%d:%d])\n", Symbol_to_string(token.type), token.value, token.length, token.loc.pos, token.loc.row, token.loc.col);
-    free(token.value);
-}
 
 typedef struct {
     Symbol type;
@@ -47,7 +35,33 @@ bool stack_is_empty(void *stack) {
     return linked_list_len(stack) == 0;
 }
 
-bool parse(const char *filename, const char *source, size_t source_length) {
+SyntaxError create_not_matching_terminal_error(Token *token, Lexer *lexer) {
+    SyntaxError error = {
+        ParserError,
+        strdup("not_matching_terminal_error"), // TODO: improve error messages
+        token->length,
+        token->loc,
+        lexer->source,
+        lexer->source_length
+    };
+
+    return error;
+}
+
+SyntaxError create_not_matching_rule_error(Token *token, Lexer *lexer) {
+    SyntaxError error = {
+        ParserError,
+        strdup("not_matching_rule_error"), // TODO: improve error messages
+        token->length,
+        token->loc,
+        lexer->source,
+        lexer->source_length
+    };
+
+    return error;
+}
+
+ParsingResult parse(const char *filename, const char *source, size_t source_length) {
     Lexer lexer = new_Lexer(filename, source, source_length);
     void *stack = new_linked_list(sizeof(StackItem));
     
@@ -55,22 +69,29 @@ bool parse(const char *filename, const char *source, size_t source_length) {
     stack_push(stack, NT_Rules);
 
     Token token = Lexer_next_token(&lexer);
-    bool accepted = true;
+    SyntaxError *errors = (SyntaxError *)new_vector(sizeof(SyntaxError), 0);
 
     while (!stack_is_empty(stack)) {
         StackItem top = stack_pop(stack);
 
         if (is_Terminal(top.type)) {
             if (top.type != token.type) {
-                accepted = false;
-                perror("not_matching_terminal_error\n");
+                if (token.type == T_Invalid) {
+                    vector_push((void **)&errors, &lexer.last_error);
+                }
+
+                SyntaxError error = create_not_matching_terminal_error(&token, &lexer);
+                vector_push((void **)&errors, &error);
 
                 stack_push(stack, top.type);
+
+                free_string(token.value); // TODO: Remove when adding ast
                 token = Lexer_next_token(&lexer);
                 continue;
             }
 
             
+            free_string(token.value); // TODO: Remove when adding ast
             token = Lexer_next_token(&lexer);
             continue;
         }
@@ -79,10 +100,12 @@ bool parse(const char *filename, const char *source, size_t source_length) {
             const Rule *rule = todo_table_get(top.type, token.type);
             
             if (rule == NULL) {
-                accepted = false;
-                perror("not_matching_rule_error\n");
+                SyntaxError error = create_not_matching_rule_error(&token, &lexer);
+                vector_push((void **)&errors, &error);
 
                 stack_push(stack, top.type);
+
+                free_string(token.value); // TODO: Remove when adding ast
                 token = Lexer_next_token(&lexer);
                 continue;
             }
@@ -100,5 +123,11 @@ bool parse(const char *filename, const char *source, size_t source_length) {
     }
     free_linked_list(stack);
 
-    return accepted;
+    ParsingResult result = {
+        NULL,
+        errors
+    };
+
+    return result;
 }
+

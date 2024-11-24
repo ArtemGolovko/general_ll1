@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <excpt.h>
-#include "gram_parser.h"
+#include <vcruntime.h>
+
+#include "gram_parser/error.h"
 #include "gram_parser/parser.h"
+
 #include "read_file_to_string.h"
+#include "datastructs/vector.h"
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -22,20 +26,26 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("Size: %d\nContent:\n%.*s\n", info.length, info.length, info.buffer);
+    printf("Size: %zd\nContent:\n%.*s\n", info.length, info.length, info.buffer);
 
     __try { 
         printf("Parsing...\n");
+        
+        ParsingResult result = parse(filename, info.buffer, info.length);
+        size_t number_of_errors = vector_len(result.errors);
 
-        test_lexer(filename, info.buffer, info.length);
+        if (number_of_errors == 0) {
+            printf("parsing success\n");
+        } else {
+            printf("parsing failed\nNumber of errors: %zd\n", number_of_errors);
+            
+            for (size_t i = 0; i < number_of_errors; i += 1) {
+                SyntaxError_display(&result.errors[i]);
+                free_SyntaxError(&result.errors[i]);
+            }
+        }
 
-        // bool accepted = parse(filename, info.buffer, info.length);
-        //
-        // if (accepted) {
-        //     printf("parsing success\n");
-        // } else {
-        //     printf("parsing failed\n");
-        // }
+        free_vector(result.errors);
     }  __except(-1) {
         perror("Segmentaion fault\n");
     }

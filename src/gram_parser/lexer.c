@@ -362,7 +362,3 @@ Token Lexer_next_token(Lexer *lexer) {
     
     return Lexer_capture_Invalid(lexer, 0);
 }
-
-SyntaxError Lexer_get_last_error(Lexer *lexer) {
-    return lexer->last_error;
-}
