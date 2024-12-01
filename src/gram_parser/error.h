@@ -1,6 +1,6 @@
 #pragma once
 
-#include "location.h"
+#include "gram_parser/location.h"
 
 typedef enum {
     LexerError,

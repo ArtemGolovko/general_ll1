@@ -1,7 +1,8 @@
 #pragma once
 
 #include <stdbool.h>
-#include "grammar.h"
+
+#include "gram_parser/grammar.h"
 
 struct ASTNode_s {
     Symbol type;
@@ -77,6 +78,7 @@ typedef struct ASTItemsPrime_s ASTItemsPrime;
 typedef struct ASTItem_s ASTItem;
 
 bool is_ast_type_supported(Symbol type);
+bool is_ast_value_type(Symbol type);
 size_t get_ast_node_size(Symbol type);
 ASTNode *create_ast_node(Symbol type);
 void free_ast(ASTNode *ast_root);

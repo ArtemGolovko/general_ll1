@@ -2,10 +2,10 @@
 
 #include <string.h>
 
-#include "gram_parser/ast.h"
-#include "grammar.h"
-#include "lexer.h"
+#include "gram_parser/grammar.h"
+#include "gram_parser/lexer.h"
 #include "gram_parser/error.h"
+#include "gram_parser/ast.h"
 
 #include "datastructs/string.h"
 #include "datastructs/vector.h"
@@ -93,7 +93,7 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
                 continue;
             }
 
-            if (top.ast_node != NULL && (token.type == T_NonTerminal || token.type == T_TerminalLiteral)) {
+            if (top.ast_node != NULL && is_ast_value_type(token.type)) {
                 ((ASTNodeValue *)top.ast_node)->value = token.value;
             }
 
@@ -134,12 +134,8 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
             }
             continue;
         }
-
-        if (top.type == Epsillon) {
-            // Left for ast constuction
-            continue;
-        }
     }
+
     free_linked_list(stack);
 
     ParsingResult result = {

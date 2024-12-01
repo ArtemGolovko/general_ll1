@@ -1,8 +1,8 @@
 #pragma once
 
-#include "location.h"
+#include "gram_parser/location.h"
 #include "gram_parser/error.h"
-#include "grammar.h"
+#include "gram_parser/grammar.h"
 
 
 typedef struct {

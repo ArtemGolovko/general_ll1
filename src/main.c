@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <excpt.h>
-#include <stddef.h>
 
 #include "gram_parser/ast.h"
 #include "gram_parser/error.h"

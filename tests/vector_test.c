@@ -3,7 +3,7 @@
 #include <check.h>
 
 #include <stdio.h>
-#include "../src/datastructs/vector.h"
+#include "datastructs/vector.h"
 
 
 START_TEST(vector_test_internals)

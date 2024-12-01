@@ -4,7 +4,9 @@
 #include <ctype.h>
 #include <assert.h>
 #include <time.h>
+
 #include "datastructs/string.h"
+
 #include "gram_parser/error.h"
 #include "gram_parser/grammar.h"
 

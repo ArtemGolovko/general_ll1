@@ -4,9 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "gram_parser/grammar.h"
+
 #include "datastructs/linked_list.h"
 #include "datastructs/string.h"
-#include "gram_parser/grammar.h"
 
 bool is_ast_type_supported(Symbol type) {
     switch (type) {
@@ -20,6 +21,10 @@ bool is_ast_type_supported(Symbol type) {
     default:
         return true;
     }
+}
+
+bool is_ast_value_type(Symbol type) {
+    return type == T_NonTerminal || type == T_TerminalLiteral;
 }
 
 size_t get_ast_node_size(Symbol type) {
@@ -87,7 +92,7 @@ void free_ast(ASTNode *ast_root) {
             continue;
         }
 
-        if (ast_node->type == T_TerminalLiteral || ast_node->type == T_NonTerminal) {
+        if (is_ast_value_type(ast_node->type)) {
             ASTNodeValue *ast_node_value = (ASTNodeValue *)ast_node;
             free_string(ast_node_value->value);
 

@@ -19,8 +19,8 @@
 - [x] Lexer
 - [x] Remake lexer (current version is too bugged)
 - [x] Parser
-- [ ] AST
-- [ ] Panic mode error recovery
+- [x] AST
+- [x] Panic mode error recovery
 - [ ] Parsing level error recovery (Maybe)
 
 ## Stage 2: Analyzer
