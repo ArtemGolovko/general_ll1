@@ -39,7 +39,7 @@ bool stack_is_empty(void *stack) {
 SyntaxError create_not_matching_terminal_error(Token *token, Lexer *lexer) {
     SyntaxError error = {
         ParserError,
-        strdup("not_matching_terminal_error"), // TODO: improve error messages
+        strdup("Unexpected token"),
         token->length,
         token->loc,
         lexer->source,
@@ -52,7 +52,7 @@ SyntaxError create_not_matching_terminal_error(Token *token, Lexer *lexer) {
 SyntaxError create_not_matching_rule_error(Token *token, Lexer *lexer) {
     SyntaxError error = {
         ParserError,
-        strdup("not_matching_rule_error"), // TODO: improve error messages
+        strdup("Invalid syntax"),
         token->length,
         token->loc,
         lexer->source,
