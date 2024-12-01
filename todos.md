@@ -10,6 +10,19 @@
 - [x] Double linked list
 - [x] String (growable string)
 
+## Gram parser rewrite
+- New fixed grammar
+- Top Down AST construction
+- Error recovery
+
+- [x] Symbols, Grammar, Todo Table
+- [x] Lexer
+- [x] Remake lexer (current version is too bugged)
+- [x] Parser
+- [x] AST
+- [x] Panic mode error recovery
+- [ ] Parsing level error recovery (Maybe)
+
 ## Stage 2: Analyzer
 - [ ] Construct symbolic table
 - [ ] Convert AST to grammar
