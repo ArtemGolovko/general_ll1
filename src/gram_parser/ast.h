@@ -17,8 +17,8 @@ struct ASTNodeValue_s {
 struct ASTRules_s {
     Symbol type;
 
-    struct ASTRulesPrime_s *rules_prime;
     struct ASTRule_s *rule;
+    struct ASTRulesPrime_s *rules_prime;
 };
 
 struct ASTRulesPrime_s {
@@ -30,8 +30,8 @@ struct ASTRulesPrime_s {
 struct ASTRule_s {
     Symbol type;
 
-    struct ASTRHS_s *rhs;
     struct ASTLHS_s *lhs;
+    struct ASTRHS_s *rhs;
 };
 
 struct ASTLHS_s {
@@ -49,8 +49,8 @@ struct ASTRHS_s {
 struct ASTItems_s {
     Symbol type;
 
-    struct ASTItemsPrime_s *items_prime;
     struct ASTItem_s *item;
+    struct ASTItemsPrime_s *items_prime;
 };
 
 struct ASTItemsPrime_s {
@@ -80,3 +80,5 @@ bool is_ast_type_supported(Symbol type);
 size_t get_ast_node_size(Symbol type);
 ASTNode *create_ast_node(Symbol type);
 void free_ast(ASTNode *ast_root);
+
+#define AST_NTH_SUBNODE(ast_node, n) (*((ASTNode **)((char *)(ast_node) + (((n) + 1) * 8))))

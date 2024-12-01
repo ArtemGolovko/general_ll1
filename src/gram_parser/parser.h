@@ -1,10 +1,12 @@
 #pragma once
 
-#include "gram_parser/error.h"
 #include <stdbool.h>
 
+#include "gram_parser/error.h"
+#include "gram_parser/ast.h"
+
 typedef struct {
-    void *ast;
+    ASTRules *ast;
     SyntaxError *errors;
 } ParsingResult;
 

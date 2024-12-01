@@ -11,7 +11,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_compile_options(/TC /Zi /fsanitize=address)
+# add_compile_options(/TC /Zi /fsanitize=address)
+add_compile_options(/TC /Zi)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/vendor/Check/include)

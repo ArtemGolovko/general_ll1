@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "gram_parser/ast.h"
 #include "grammar.h"
 #include "lexer.h"
 #include "gram_parser/error.h"
@@ -10,15 +11,15 @@
 #include "datastructs/vector.h"
 #include "datastructs/linked_list.h"
 
-
-
 typedef struct {
     Symbol type;
+    ASTNode *ast_node;
 } StackItem;
 
-void stack_push(void *stack, Symbol type) {
+void stack_push(void *stack, Symbol type, ASTNode *ast_node) {
     StackItem item = {
-        type
+        type,
+        ast_node
     };
 
     linked_list_push(stack, &item);
@@ -65,8 +66,10 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
     Lexer lexer = new_Lexer(filename, source, source_length);
     void *stack = new_linked_list(sizeof(StackItem));
     
-    stack_push(stack, T_EOF);
-    stack_push(stack, NT_Rules);
+    ASTRules *ast_root = (ASTRules *)create_ast_node(NT_Rules);
+
+    stack_push(stack, T_EOF, NULL);
+    stack_push(stack, NT_Rules, (ASTNode *)ast_root);
 
     Token token = Lexer_next_token(&lexer);
     SyntaxError *errors = (SyntaxError *)new_vector(sizeof(SyntaxError), 0);
@@ -83,15 +86,17 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
                 SyntaxError error = create_not_matching_terminal_error(&token, &lexer);
                 vector_push((void **)&errors, &error);
 
-                stack_push(stack, top.type);
+                stack_push(stack, top.type, top.ast_node);
 
-                free_string(token.value); // TODO: Remove when adding ast
+                free_string(token.value);
                 token = Lexer_next_token(&lexer);
                 continue;
             }
 
-            
-            free_string(token.value); // TODO: Remove when adding ast
+            if (top.ast_node != NULL && (token.type == T_NonTerminal || token.type == T_TerminalLiteral)) {
+                ((ASTNodeValue *)top.ast_node)->value = token.value;
+            }
+
             token = Lexer_next_token(&lexer);
             continue;
         }
@@ -107,15 +112,25 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
                 SyntaxError error = create_not_matching_rule_error(&token, &lexer);
                 vector_push((void **)&errors, &error);
 
-                stack_push(stack, top.type);
+                stack_push(stack, top.type, top.ast_node);
 
-                free_string(token.value); // TODO: Remove when adding ast
+                free_string(token.value);
                 token = Lexer_next_token(&lexer);
                 continue;
             }
+            
+
+            size_t ast_node_size = get_ast_node_size(top.ast_node->type);
+            size_t index = (ast_node_size - sizeof(ASTNode)) / sizeof(ASTNode *) - 1;
 
             for (size_t i = rule->rhs_length; i > 0; i -= 1) {
-                stack_push(stack, rule->rhs[i - 1]);
+                if (top.ast_node != NULL && is_ast_type_supported(rule->rhs[i - 1])) {
+                    AST_NTH_SUBNODE(top.ast_node, index) = create_ast_node(rule->rhs[i - 1]);
+                    stack_push(stack, rule->rhs[i - 1], AST_NTH_SUBNODE(top.ast_node, index));
+                    index -= 1;
+                    continue;
+                }
+                stack_push(stack, rule->rhs[i - 1], NULL);
             }
             continue;
         }
@@ -128,7 +143,7 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
     free_linked_list(stack);
 
     ParsingResult result = {
-        NULL,
+        ast_root,
         errors
     };
 

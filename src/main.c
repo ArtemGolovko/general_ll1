@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <excpt.h>
-#include <vcruntime.h>
+#include <stddef.h>
 
+#include "gram_parser/ast.h"
 #include "gram_parser/error.h"
 #include "gram_parser/parser.h"
 
@@ -44,7 +45,8 @@ int main(int argc, char **argv) {
                 free_SyntaxError(&result.errors[i]);
             }
         }
-
+        
+        free_ast((ASTNode *)result.ast);
         free_vector(result.errors);
     }  __except(-1) {
         perror("Segmentaion fault\n");
@@ -54,3 +56,5 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
+// (*((ASTNode **)((char *)rules + 8)))->type
