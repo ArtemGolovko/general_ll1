@@ -23,6 +23,21 @@
 - [x] Panic mode error recovery
 - [ ] Parsing level error recovery (Maybe)
 
+## Update helper script
+- Crossshell python script
+- Moves from MSVC to CMake Tools
+- More commands and options
+
+- [x] build command
+- [x] run command
+- [x] test command
+- [ ] debug command
+- [ ] gen-compile-commands command 
+- [x] --help option
+- [ ] --config option
+- [ ] --build option
+
+
 ## Stage 2: Analyzer
 - [ ] Construct symbolic table
 - [ ] Convert AST to grammar

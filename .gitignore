@@ -3,8 +3,8 @@
 *.ilk
 *.pdb
 
-out/*
-out2
-!out/.gitkeep
+build
+build_*
+
 
 .cache
