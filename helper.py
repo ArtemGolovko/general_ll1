@@ -71,6 +71,18 @@ def command_test(parsed_args, rest_args):
     test_args = " ".join(rest_args)
     run_command(f"ctest -C {parsed_args.config} {test_args}", cwd=PROJECT_BUILD_DIR)
 
+def command_debug(parsed_args, rest_args):
+    assert_installed("WinDbgX") 
+    
+    if parsed_args.build:
+        build_custom("Debug", "main")
+
+    exe_full_path = os.path.join(get_project_binary_dir("Debug"), MAIN_EXECUTABLE) 
+    exe_args = " ".join(rest_args)
+
+    print(f"\nRunning WinDbgX {exe_full_path} {exe_args}\n")
+    subprocess.Popen(["WinDbgX", exe_full_path, *rest_args])
+
 def main() -> None:
     parser = argparse.ArgumentParser(
                         prog="Helper",
@@ -89,6 +101,8 @@ def main() -> None:
     test_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
     test_parser.add_argument("-B", "--build", dest="build", action=argparse.BooleanOptionalAction)
 
+    debug_parser = subparsers.add_parser("debug", help="Launches debugger")
+    debug_parser.add_argument("-B", "--build", dest="build", action=argparse.BooleanOptionalAction)
 
     args, rest_args = get_rest_args(sys.argv)
     parsed_args = parser.parse_args(args);
@@ -103,6 +117,8 @@ def main() -> None:
         case "test":
             command_test(parsed_args, rest_args)
     
+        case "debug":
+            command_debug(parsed_args, rest_args)
 
 
 if __name__ == "__main__":

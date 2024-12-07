@@ -31,7 +31,7 @@
 - [x] build command
 - [x] run command
 - [x] test command
-- [ ] debug command
+- [x] debug command
 - [ ] gen-compile-commands command 
 - [x] --help option
 - [x] --config option
