@@ -35,11 +35,23 @@ def run_command(command: str, end_on_fail=True, cwd=None) -> None|NoReturn:
         print(f"Failed with status code: {status}")
         exit(1)
 
-def command_build(parsed_args) -> None:
+
+def build_custom(config: str, target: str):
     assert_installed("cmake") 
 
+    assert target in ["all", "main", "tests"]
+
+    actual_target = {
+        "all": "ALL_BUILD",
+        "main": PROJECT_NAME,
+        "tests": "tests"
+    }[target]
+
     run_command(f"cmake -S {PROJECT_ROOT} -B {PROJECT_BUILD_DIR}")
-    run_command(f"cmake --build {PROJECT_BUILD_DIR} -j 4 --config {parsed_args.config}")
+    run_command(f"cmake --build {PROJECT_BUILD_DIR} -j 4 --config {config} --target {actual_target}")
+
+def command_build(parsed_args) -> None:
+    build_custom(parsed_args.config, parsed_args.target)
 
 def command_run(parsed_args, rest_args):
     exe_full_path = os.path.join(get_project_binary_dir(parsed_args.config), MAIN_EXECUTABLE) 
@@ -61,6 +73,7 @@ def main() -> None:
     
     build_parser = subparsers.add_parser("build", help="Build source code")
     build_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
+    build_parser.add_argument("-T", "--target", dest="target", choices=["all", "main", "tests"], default="main")
 
     run_parser = subparsers.add_parser("run", help="Runs compiled executable")
     run_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)

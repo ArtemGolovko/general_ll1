@@ -35,6 +35,7 @@
 - [ ] gen-compile-commands command 
 - [x] --help option
 - [x] --config option
+- [x] --target option
 - [ ] --build option
 
 ## Bugfixes
