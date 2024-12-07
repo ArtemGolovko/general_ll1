@@ -54,6 +54,9 @@ def command_build(parsed_args) -> None:
     build_custom(parsed_args.config, parsed_args.target)
 
 def command_run(parsed_args, rest_args):
+    if parsed_args.build:
+        build_custom(parsed_args.config, "main")
+
     exe_full_path = os.path.join(get_project_binary_dir(parsed_args.config), MAIN_EXECUTABLE) 
     exe_args = " ".join(rest_args)
 
@@ -61,6 +64,9 @@ def command_run(parsed_args, rest_args):
 
 def command_test(parsed_args, rest_args):
     assert_installed("ctest")
+
+    if parsed_args.build:
+        build_custom(parsed_args.config, "tests")
 
     test_args = " ".join(rest_args)
     run_command(f"ctest -C {parsed_args.config} {test_args}", cwd=PROJECT_BUILD_DIR)
@@ -77,9 +83,11 @@ def main() -> None:
 
     run_parser = subparsers.add_parser("run", help="Runs compiled executable")
     run_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
+    run_parser.add_argument("-B", "--build", dest="build", action=argparse.BooleanOptionalAction)
 
     test_parser = subparsers.add_parser("test", help="Runs tests")
     test_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
+    test_parser.add_argument("-B", "--build", dest="build", action=argparse.BooleanOptionalAction)
 
 
     args, rest_args = get_rest_args(sys.argv)

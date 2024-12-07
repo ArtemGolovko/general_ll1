@@ -36,7 +36,7 @@
 - [x] --help option
 - [x] --config option
 - [x] --target option
-- [ ] --build option
+- [x] --build option
 
 ## Bugfixes
 - [ ] Fix memory leak in free_ast
