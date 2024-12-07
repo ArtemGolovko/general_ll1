@@ -32,7 +32,7 @@
 - [x] run command
 - [x] test command
 - [x] debug command
-- [ ] gen-compile-commands command 
+- [x] gen-compile-commands command 
 - [x] --help option
 - [x] --config option
 - [x] --target option

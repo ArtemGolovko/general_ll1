@@ -1,92 +1,86 @@
 [
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\linked_list.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\linked_list.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\linked_list.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\linked_list.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/datastructs/linked_list.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/datastructs/linked_list.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\string.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\string.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\string.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\string.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/datastructs/string.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/datastructs/string.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\vector.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\vector.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\vector.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\vector.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/datastructs/vector.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/datastructs/vector.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\vector_test.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\vector_test.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\datastructs\\vector_test.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\datastructs\\vector_test.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/datastructs/vector_test.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/datastructs/vector_test.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\error.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\error.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\ast.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\ast.c",
+  "file": "C:/Users/Artem/projects/general_ll1/src/gram_parser/ast.c",
+  "output": "CMakeFiles/general_ll1_lib.dir/src/gram_parser/ast.c.obj"
+},
+{
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\error.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\error.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/gram_parser/error.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/gram_parser/error.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\grammar.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\grammar.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\grammar.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\grammar.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/gram_parser/grammar.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/gram_parser/grammar.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\lexer.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\lexer.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\lexer.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\lexer.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/gram_parser/lexer.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/gram_parser/lexer.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\parser.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\parser.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\gram_parser\\parser.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\gram_parser\\parser.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/gram_parser/parser.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/gram_parser/parser.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\read_file_to_string.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\read_file_to_string.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1_lib.dir\\src\\read_file_to_string.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\read_file_to_string.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/read_file_to_string.c",
   "output": "CMakeFiles/general_ll1_lib.dir/src/read_file_to_string.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1_lib.dir\\src\\reader.c.obj /FdCMakeFiles\\general_ll1_lib.dir\\general_ll1_lib.pdb /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\reader.c",
-  "file": "C:/Users/Artem/projects/general_ll1/src/reader.c",
-  "output": "CMakeFiles/general_ll1_lib.dir/src/reader.c.obj"
-},
-{
-  "directory": "C:/Users/Artem/projects/general_ll1/out2",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\general_ll1.dir\\src\\main.c.obj /FdCMakeFiles\\general_ll1.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\main.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\general_ll1.dir\\src\\main.c.obj /FdCMakeFiles\\general_ll1.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\src\\main.c",
   "file": "C:/Users/Artem/projects/general_ll1/src/main.c",
   "output": "CMakeFiles/general_ll1.dir/src/main.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2/tests",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\linked_list_test.dir\\linked_list_test.c.obj /FdCMakeFiles\\linked_list_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\linked_list_test.c",
-  "file": "C:/Users/Artem/projects/general_ll1/tests/linked_list_test.c",
-  "output": "tests/CMakeFiles/linked_list_test.dir/linked_list_test.c.obj"
-},
-{
-  "directory": "C:/Users/Artem/projects/general_ll1/out2/tests",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\reader_test.dir\\reader_test.c.obj /FdCMakeFiles\\reader_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\reader_test.c",
-  "file": "C:/Users/Artem/projects/general_ll1/tests/reader_test.c",
-  "output": "tests/CMakeFiles/reader_test.dir/reader_test.c.obj"
-},
-{
-  "directory": "C:/Users/Artem/projects/general_ll1/out2/tests",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\string_test.dir\\string_test.c.obj /FdCMakeFiles\\string_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\string_test.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp/tests",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\string_test.dir\\string_test.c.obj /FdCMakeFiles\\string_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\string_test.c",
   "file": "C:/Users/Artem/projects/general_ll1/tests/string_test.c",
   "output": "tests/CMakeFiles/string_test.dir/string_test.c.obj"
 },
 {
-  "directory": "C:/Users/Artem/projects/general_ll1/out2/tests",
-  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /Zi /fsanitize=address /FoCMakeFiles\\vector_test.dir\\vector_test.c.obj /FdCMakeFiles\\vector_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\vector_test.c",
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp/tests",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\vector_test.dir\\vector_test.c.obj /FdCMakeFiles\\vector_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\vector_test.c",
   "file": "C:/Users/Artem/projects/general_ll1/tests/vector_test.c",
   "output": "tests/CMakeFiles/vector_test.dir/vector_test.c.obj"
+},
+{
+  "directory": "C:/Users/Artem/projects/general_ll1/build_temp/tests",
+  "command": "C:\\PROGRA~2\\MICROS~2\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1439~1.335\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Users\\Artem\\projects\\general_ll1\\src -IC:\\Users\\Artem\\projects\\general_ll1\\vendor\\Check\\include /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /TC /FoCMakeFiles\\linked_list_test.dir\\linked_list_test.c.obj /FdCMakeFiles\\linked_list_test.dir\\ /FS -c C:\\Users\\Artem\\projects\\general_ll1\\tests\\linked_list_test.c",
+  "file": "C:/Users/Artem/projects/general_ll1/tests/linked_list_test.c",
+  "output": "tests/CMakeFiles/linked_list_test.dir/linked_list_test.c.obj"
 }
 ]

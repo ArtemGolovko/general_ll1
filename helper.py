@@ -83,6 +83,22 @@ def command_debug(parsed_args, rest_args):
     print(f"\nRunning WinDbgX {exe_full_path} {exe_args}\n")
     subprocess.Popen(["WinDbgX", exe_full_path, *rest_args])
 
+def command_gen_compile_commands():
+    assert_installed("cmake") 
+    
+    temp_build_dir = os.path.join(PROJECT_ROOT, "build_temp")
+    run_command(f"cmake -G \"NMake Makefiles\" -S {PROJECT_ROOT} -B {temp_build_dir}")
+    
+    print("\nUpdating compile_commands.json contents...\n")
+
+    src_path = os.path.join(temp_build_dir, "compile_commands.json")
+    dest_path = os.path.join(PROJECT_ROOT, "compile_commands.json")
+
+    shutil.copyfile(src_path, dest_path)
+
+    print("Removing build_temp directory...\n") 
+    shutil.rmtree(temp_build_dir)
+
 def main() -> None:
     parser = argparse.ArgumentParser(
                         prog="Helper",
@@ -104,6 +120,8 @@ def main() -> None:
     debug_parser = subparsers.add_parser("debug", help="Launches debugger")
     debug_parser.add_argument("-B", "--build", dest="build", action=argparse.BooleanOptionalAction)
 
+    subparsers.add_parser("gen-compile-commands", help="Launches debugger")
+
     args, rest_args = get_rest_args(sys.argv)
     parsed_args = parser.parse_args(args);
 
@@ -119,6 +137,9 @@ def main() -> None:
     
         case "debug":
             command_debug(parsed_args, rest_args)
+
+        case "gen-compile-commands":
+            command_gen_compile_commands()
 
 
 if __name__ == "__main__":
