@@ -8,10 +8,10 @@ from typing import NoReturn
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 PROJECT_NAME = "general_ll1"
 PROJECT_BUILD_DIR = os.path.join(PROJECT_ROOT, "build")
-DEFAULT_PROJECT_CONFIG = "Debug"
+DEFAULT_PROJECT_CONFIG = "Dev"
 MAIN_EXECUTABLE = PROJECT_NAME + ".exe"
 
-def get_project_binary_dir(conifg = DEFAULT_PROJECT_CONFIG) -> str:
+def get_project_binary_dir(conifg: str) -> str:
     return os.path.join(PROJECT_BUILD_DIR, "bin", conifg)
 
 def get_rest_args(args: list[str]) -> tuple[list[str], list[str]]:
@@ -35,23 +35,23 @@ def run_command(command: str, end_on_fail=True, cwd=None) -> None|NoReturn:
         print(f"Failed with status code: {status}")
         exit(1)
 
-def command_build(_parsed_args) -> None:
+def command_build(parsed_args) -> None:
     assert_installed("cmake") 
 
     run_command(f"cmake -S {PROJECT_ROOT} -B {PROJECT_BUILD_DIR}")
-    run_command(f"cmake --build {PROJECT_BUILD_DIR} -j 4")
+    run_command(f"cmake --build {PROJECT_BUILD_DIR} -j 4 --config {parsed_args.config}")
 
-def command_run(_parsed_args, rest_args):
-    exe_full_path = os.path.join(get_project_binary_dir(), MAIN_EXECUTABLE) 
+def command_run(parsed_args, rest_args):
+    exe_full_path = os.path.join(get_project_binary_dir(parsed_args.config), MAIN_EXECUTABLE) 
     exe_args = " ".join(rest_args)
 
     run_command(f"\"{exe_full_path}\" {exe_args}", end_on_fail=False)
 
-def command_test(_parsed_args, rest_args):
+def command_test(parsed_args, rest_args):
     assert_installed("ctest")
 
     test_args = " ".join(rest_args)
-    run_command(f"ctest -C {DEFAULT_PROJECT_CONFIG} {test_args}", cwd=PROJECT_BUILD_DIR)
+    run_command(f"ctest -C {parsed_args.config} {test_args}", cwd=PROJECT_BUILD_DIR)
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -60,8 +60,13 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", help='Subcommands')
     
     build_parser = subparsers.add_parser("build", help="Build source code")
+    build_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
+
     run_parser = subparsers.add_parser("run", help="Runs compiled executable")
+    run_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
+
     test_parser = subparsers.add_parser("test", help="Runs tests")
+    test_parser.add_argument("-C", "--config", dest="config", default=DEFAULT_PROJECT_CONFIG)
 
 
     args, rest_args = get_rest_args(sys.argv)

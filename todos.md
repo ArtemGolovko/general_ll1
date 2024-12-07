@@ -34,7 +34,7 @@
 - [ ] debug command
 - [ ] gen-compile-commands command 
 - [x] --help option
-- [ ] --config option
+- [x] --config option
 - [ ] --build option
 
 ## Bugfixes
