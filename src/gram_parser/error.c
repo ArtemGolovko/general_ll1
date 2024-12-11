@@ -6,6 +6,20 @@
 #include <math.h>
 
 void SyntaxError_display(SyntaxError *error) {
+
+    if (error->token_length == 0) {
+        printf("%s:%zd:%zd\n    ", error->loc.filename, error->loc.row, error->loc.col);
+
+        if (error->origin == LexerError) {
+            printf("Lexer");
+        } else {
+            printf("Parser");
+        }
+
+        printf(" Error: %s\n", error->message);
+        return;
+    }
+
     // Get the line from source code where error happend
     int line_start = error->loc.pos - (error->loc.col - 1);
     const char *line = error->source + line_start;

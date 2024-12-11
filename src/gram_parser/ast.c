@@ -110,4 +110,6 @@ void free_ast(ASTNode *ast_root) {
 
         free(ast_node);
     }
+
+    free_linked_list(stack);
 }

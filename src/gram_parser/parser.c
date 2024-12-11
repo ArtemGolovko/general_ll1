@@ -62,6 +62,19 @@ SyntaxError create_not_matching_rule_error(Token *token, Lexer *lexer) {
     return error;
 }
 
+SyntaxError create_unexcpected_eof_error(Token *token, Lexer *lexer) {
+    SyntaxError error = {
+        ParserError,
+        strdup("Unexcpected end of file"),
+        token->length,
+        token->loc,
+        lexer->source,
+        lexer->source_length
+    };
+
+    return error;
+}
+
 ParsingResult parse(const char *filename, const char *source, size_t source_length) {
     Lexer lexer = new_Lexer(filename, source, source_length);
     void *stack = new_linked_list(sizeof(StackItem));
@@ -79,6 +92,12 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
 
         if (is_Terminal(top.type)) {
             if (top.type != token.type) {
+                if (token.type == T_EOF) {
+                    SyntaxError error = create_unexcpected_eof_error(&token, &lexer);
+                    vector_push((void **)&errors, &error);
+                    break;
+                }
+
                 if (token.type == T_Invalid) {
                     vector_push((void **)&errors, &lexer.last_error);
                 }
@@ -105,6 +124,10 @@ ParsingResult parse(const char *filename, const char *source, size_t source_leng
             const Rule *rule = todo_table_get(top.type, token.type);
             
             if (rule == NULL) {
+                if (token.type == T_EOF) {
+                    break;
+                }
+
                 if (token.type == T_Invalid) {
                     vector_push((void **)&errors, &lexer.last_error);
                 }

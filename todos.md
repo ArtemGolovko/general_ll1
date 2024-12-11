@@ -39,9 +39,9 @@
 - [x] --build option
 
 ## Bugfixes
-- [ ] Fix memory leak in free_ast
-- [ ] Fix infinite loop in parser
-- [ ] Remove comments in main.c
+- [x] Fix memory leak in free_ast
+- [x] Fix infinite loop in parser
+- [x] Remove comments in main.c
 
 ## Stage 2: Analyzer
 - [ ] Construct symbolic table
