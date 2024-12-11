@@ -41,7 +41,7 @@
 ## Bugfixes
 - [ ] Fix memory leak in free_ast
 - [ ] Fix infinite loop in parser
-- [ ] Remove comments in main.c
+- [x] Remove comments in main.c
 
 ## Stage 2: Analyzer
 - [ ] Construct symbolic table

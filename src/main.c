@@ -26,8 +26,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("Size: %zd\nContent:\n%.*s\n", info.length, info.length, info.buffer);
-
     __try { 
         printf("Parsing...\n");
         
@@ -55,5 +53,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-// (*((ASTNode **)((char *)rules + 8)))->type
