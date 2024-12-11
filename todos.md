@@ -39,7 +39,7 @@
 - [x] --build option
 
 ## Bugfixes
-- [ ] Fix memory leak in free_ast
+- [x] Fix memory leak in free_ast
 - [ ] Fix infinite loop in parser
 - [x] Remove comments in main.c
 
