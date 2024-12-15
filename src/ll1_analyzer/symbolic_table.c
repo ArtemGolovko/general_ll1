@@ -1,17 +1,31 @@
 #include "symbolic_table.h"
 
+#include <string.h>
+
 #include "datastructs/linked_list.h"
 #include "datastructs/vector.h"
 #include "gram_parser/ast.h"
 #include "gram_parser/grammar.h"
-#include <string.h>
+#include "ll1_analyzer/terminal_literal_name.h"
 
-SymbolRecord *linear_search_SymbolicTable(SymbolicTable *table, const char *name) {
+SymbolRecord *linear_search_symbols(SymbolicTable *table, const char *name) {
     for (size_t i = 0; i < vector_len(table->symbols); i += 1) {
         const char *symbol_name = table->symbols[i].name;
         
         if (symbol_name != NULL && strcmp(symbol_name, name) == 0) {
             return &table->symbols[i];
+        }
+    }
+
+    return NULL;
+}
+
+TerminalValueRecord *linear_search_terminal_values(SymbolicTable *table, const char *value) {
+    for (size_t i = 0; i < vector_len(table->terminal_values); i += 1) {
+        const char *terminal_value = table->terminal_values[i].value;
+        
+        if (strcmp(terminal_value, value) == 0) {
+            return &table->terminal_values[i];
         }
     }
 
@@ -49,7 +63,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
             linked_list_push(items_stack, &ast_items);
         }
 
-        if (linear_search_SymbolicTable(&table, name) == NULL) {
+        if (linear_search_symbols(&table, name) == NULL) {
             SymbolRecord record = {
                 id,
                 NonTerminal,
@@ -60,6 +74,54 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
         }
         
         rules = rules->rules_prime->rules;
+    }
+    
+    SymbolRecord eof_record = {
+        id,
+        Terminal,
+        strdup("eof")
+    };
+    vector_push((void **)&table.symbols, &eof_record);
+    table.eof_id = id;
+    id += 1;
+
+    SymbolRecord invalid_record = {
+        id,
+        Terminal,
+        strdup("invalid")
+    };
+    vector_push((void **)&table.symbols, &invalid_record);
+    table.invalid_id = id;
+    id += 1;
+
+    ASTItems* items;
+
+    while (linked_list_len(items_stack) != 0) {
+        linked_list_pop(items_stack, &items);
+
+        while (items != NULL) {
+            ASTNodeValue *item_value = items->item->non_terminal_or_terminal_literal;
+            const char *value = item_value->value;
+
+            if (item_value->type == T_TerminalLiteral && linear_search_terminal_values(&table, value) == NULL) {
+                SymbolRecord record = {
+                    id,
+                    Terminal,
+                    create_terminal_literal_name(id)
+                };
+                vector_push((void **)&table.symbols, &record);
+
+                TerminalValueRecord terminal_record = {
+                    id,
+                    strdup(value)
+                };
+                vector_push((void **)&table.terminal_values, &terminal_record);
+
+                id += 1;
+            }
+
+            items = items->items_prime->items;
+        }
     }
 
     free_linked_list(items_stack);
