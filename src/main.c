@@ -6,6 +6,7 @@
 #include "gram_parser/error.h"
 #include "gram_parser/parser.h"
 
+#include "ll1_analyzer/analyzer.h"
 #include "read_file_to_string.h"
 #include "datastructs/vector.h"
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
             }
         }
         
+        analyze_ll1(result.ast);
         free_ast((ASTNode *)result.ast);
         free_vector(result.errors);
     }  __except(-1) {

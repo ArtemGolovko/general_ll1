@@ -24,7 +24,7 @@ typedef struct {
     SymbolRecord *symbols;
 
     /** vector */
-    TerminalValueRecord *terminalValues;
+    TerminalValueRecord *terminal_values;
 
     /** ids of important symbols */
     size_t start_non_termianl_id;
@@ -34,6 +34,7 @@ typedef struct {
 } SymbolicTable;
 
 SymbolicTable build_SymbolicTable(ASTRules *ast_root);
+void free_SymbolicTable(SymbolicTable *table);
 
 void sort_SybolicTable(SymbolicTable *table);
 void unsort_SybolicTable(SymbolicTable *table);
