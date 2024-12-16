@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <excpt.h>
 
 #include "gram_parser/ast.h"
 #include "gram_parser/error.h"
@@ -27,29 +26,25 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    __try { 
-        printf("Parsing...\n");
-        
-        ParsingResult result = parse(filename, info.buffer, info.length);
-        size_t number_of_errors = vector_len(result.errors);
+    printf("Parsing...\n");
+    
+    ParsingResult result = parse(filename, info.buffer, info.length);
+    size_t number_of_errors = vector_len(result.errors);
 
-        if (number_of_errors == 0) {
-            printf("parsing success\n");
-        } else {
-            printf("parsing failed\nNumber of errors: %zd\n", number_of_errors);
-            
-            for (size_t i = 0; i < number_of_errors; i += 1) {
-                SyntaxError_display(&result.errors[i]);
-                free_SyntaxError(&result.errors[i]);
-            }
-        }
+    if (number_of_errors == 0) {
+        printf("parsing success\n");
+    } else {
+        printf("parsing failed\nNumber of errors: %zd\n", number_of_errors);
         
-        analyze_ll1(result.ast);
-        free_ast((ASTNode *)result.ast);
-        free_vector(result.errors);
-    }  __except(-1) {
-        perror("Segmentaion fault\n");
+        for (size_t i = 0; i < number_of_errors; i += 1) {
+            SyntaxError_display(&result.errors[i]);
+            free_SyntaxError(&result.errors[i]);
+        }
     }
+    
+    analyze_ll1(result.ast);
+    free_ast((ASTNode *)result.ast);
+    free_vector(result.errors);
 
     free(info.buffer);
 

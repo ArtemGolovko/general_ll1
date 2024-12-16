@@ -1,35 +1,104 @@
 #include "symbolic_table.h"
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "array_utils.h"
 #include "datastructs/linked_list.h"
 #include "datastructs/vector.h"
 #include "gram_parser/ast.h"
 #include "gram_parser/grammar.h"
 #include "ll1_analyzer/terminal_literal_name.h"
 
-SymbolRecord *linear_search_symbols(SymbolicTable *table, const char *name) {
-    for (size_t i = 0; i < vector_len(table->symbols); i += 1) {
-        const char *symbol_name = table->symbols[i].name;
-        
-        if (symbol_name != NULL && strcmp(symbol_name, name) == 0) {
-            return &table->symbols[i];
-        }
-    }
+int compare_SymbolRecord_id(const void *_a, const void *_b) {
+    const SymbolRecord *a = _a;
+    const SymbolRecord *b = _b;
 
-    return NULL;
+    return a->id - b->id; 
 }
 
-TerminalValueRecord *linear_search_terminal_values(SymbolicTable *table, const char *value) {
-    for (size_t i = 0; i < vector_len(table->terminal_values); i += 1) {
-        const char *terminal_value = table->terminal_values[i].value;
-        
-        if (strcmp(terminal_value, value) == 0) {
-            return &table->terminal_values[i];
-        }
+int compare_SymbolRecord_name(const void *_a, const void *_b) {
+    const SymbolRecord *a = _a;
+    const SymbolRecord *b = _b;
+
+    return strcmp(a->name, b->name); 
+}
+
+int compare_TerminalValueRecord_terminal_id(const void *_a, const void *_b) {
+    const TerminalValueRecord *a = _a;
+    const TerminalValueRecord *b = _b;
+
+    return a->terminal_id - b->terminal_id;
+}
+
+int compare_TerminalValueRecord_value(const void *_a, const void *_b) {
+    const TerminalValueRecord *a = _a;
+    const TerminalValueRecord *b = _b;
+
+    return strcmp(a->value, b->value);
+}
+
+
+const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id) {
+    size_t symbols_len = vector_len(table->symbols);
+
+    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id); 
+
+    SymbolRecord search_record = { id, EpsillonType, NULL };
+
+    if (is_sorted) {
+        return &table->symbols[id];
     }
 
-    return NULL;
+    return _lfind(&search_record, table->symbols, &symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id);
+}
+
+const SymbolRecord *find_symbol_by_name(const SymbolicTable *table, const char *name) {
+    size_t symbols_len = vector_len(table->symbols);
+    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name); 
+    SymbolRecord search_record = { 0, EpsillonType, name };
+
+    if (is_sorted) {
+        return bsearch(&search_record, table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
+    }
+
+    return _lfind(&search_record, table->symbols, &symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
+}
+
+const TerminalValueRecord *find_terminal_by_terminal_id(const SymbolicTable *table, size_t id) {
+    size_t terminal_values_len = vector_len(table->terminal_values);
+    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id); 
+    TerminalValueRecord search_record = { id, NULL };
+
+    if (is_sorted) {
+        return bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
+    }
+
+    return _lfind(&search_record, table->terminal_values, &terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
+}
+
+const SymbolRecord *find_terminal_by_value(const SymbolicTable *table, const char *value) {
+    size_t terminal_values_len = vector_len(table->terminal_values);
+    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value); 
+    TerminalValueRecord search_record = { 0, value };
+
+    if (is_sorted) {
+        const TerminalValueRecord *record = bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
+        if (record == NULL) {
+            return NULL;
+        }
+
+        return find_symbol_by_id(table, record->terminal_id);
+    }
+
+    const TerminalValueRecord *record = _lfind(&search_record, table->terminal_values, &terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
+
+    if (record == NULL) {
+        return NULL;
+    }
+
+    return find_symbol_by_id(table, record->terminal_id);
 }
 
 SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
@@ -47,7 +116,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
     SymbolRecord epsillon_record = {
         0,
         EpsillonType,
-        NULL
+        strdup("_Epsillon")
     };
 
     vector_push((void **)&table.symbols, &epsillon_record);
@@ -63,7 +132,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
             linked_list_push(items_stack, &ast_items);
         }
 
-        if (linear_search_symbols(&table, name) == NULL) {
+        if (find_symbol_by_name(&table, name) == NULL) {
             SymbolRecord record = {
                 id,
                 NonTerminal,
@@ -79,7 +148,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
     SymbolRecord eof_record = {
         id,
         Terminal,
-        strdup("eof")
+        strdup("_eof")
     };
     vector_push((void **)&table.symbols, &eof_record);
     table.eof_id = id;
@@ -88,7 +157,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
     SymbolRecord invalid_record = {
         id,
         Terminal,
-        strdup("invalid")
+        strdup("_invalid")
     };
     vector_push((void **)&table.symbols, &invalid_record);
     table.invalid_id = id;
@@ -103,7 +172,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
             ASTNodeValue *item_value = items->item->non_terminal_or_terminal_literal;
             const char *value = item_value->value;
 
-            if (item_value->type == T_TerminalLiteral && linear_search_terminal_values(&table, value) == NULL) {
+            if (item_value->type == T_TerminalLiteral && find_terminal_by_value(&table, value) == NULL) {
                 SymbolRecord record = {
                     id,
                     Terminal,

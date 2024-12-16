@@ -39,6 +39,9 @@ void free_SymbolicTable(SymbolicTable *table);
 void sort_SybolicTable(SymbolicTable *table);
 void unsort_SybolicTable(SymbolicTable *table);
 
-SymbolRecord *find_symbol_by_name(const char *name);
-SymbolRecord *find_terminal_by_value(const char *value);
+const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id);
+const SymbolRecord *find_symbol_by_name(const SymbolicTable *table, const char *name);
+
+const TerminalValueRecord *find_termianl_value_by_id(const SymbolicTable *table, size_t id);
+const SymbolRecord *find_terminal_by_value(const SymbolicTable *table, const char *value);
 
