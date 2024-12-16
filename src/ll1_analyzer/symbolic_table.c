@@ -11,95 +11,6 @@
 #include "gram_parser/grammar.h"
 #include "ll1_analyzer/terminal_literal_name.h"
 
-int compare_SymbolRecord_id(const void *_a, const void *_b) {
-    const SymbolRecord *a = _a;
-    const SymbolRecord *b = _b;
-
-    return a->id - b->id; 
-}
-
-int compare_SymbolRecord_name(const void *_a, const void *_b) {
-    const SymbolRecord *a = _a;
-    const SymbolRecord *b = _b;
-
-    return strcmp(a->name, b->name); 
-}
-
-int compare_TerminalValueRecord_terminal_id(const void *_a, const void *_b) {
-    const TerminalValueRecord *a = _a;
-    const TerminalValueRecord *b = _b;
-
-    return a->terminal_id - b->terminal_id;
-}
-
-int compare_TerminalValueRecord_value(const void *_a, const void *_b) {
-    const TerminalValueRecord *a = _a;
-    const TerminalValueRecord *b = _b;
-
-    return strcmp(a->value, b->value);
-}
-
-
-const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id) {
-    size_t symbols_len = vector_len(table->symbols);
-
-    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id); 
-
-    SymbolRecord search_record = { id, EpsillonType, NULL };
-
-    if (is_sorted) {
-        return &table->symbols[id];
-    }
-
-    return _lfind(&search_record, table->symbols, &symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id);
-}
-
-const SymbolRecord *find_symbol_by_name(const SymbolicTable *table, const char *name) {
-    size_t symbols_len = vector_len(table->symbols);
-    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name); 
-    SymbolRecord search_record = { 0, EpsillonType, name };
-
-    if (is_sorted) {
-        return bsearch(&search_record, table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
-    }
-
-    return _lfind(&search_record, table->symbols, &symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
-}
-
-const TerminalValueRecord *find_terminal_by_terminal_id(const SymbolicTable *table, size_t id) {
-    size_t terminal_values_len = vector_len(table->terminal_values);
-    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id); 
-    TerminalValueRecord search_record = { id, NULL };
-
-    if (is_sorted) {
-        return bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
-    }
-
-    return _lfind(&search_record, table->terminal_values, &terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
-}
-
-const SymbolRecord *find_terminal_by_value(const SymbolicTable *table, const char *value) {
-    size_t terminal_values_len = vector_len(table->terminal_values);
-    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value); 
-    TerminalValueRecord search_record = { 0, value };
-
-    if (is_sorted) {
-        const TerminalValueRecord *record = bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
-        if (record == NULL) {
-            return NULL;
-        }
-
-        return find_symbol_by_id(table, record->terminal_id);
-    }
-
-    const TerminalValueRecord *record = _lfind(&search_record, table->terminal_values, &terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
-
-    if (record == NULL) {
-        return NULL;
-    }
-
-    return find_symbol_by_id(table, record->terminal_id);
-}
 
 SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
     void *items_stack = new_linked_list(sizeof(ASTItems *));
@@ -197,6 +108,7 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
 
     return table;
 }
+
 void free_SymbolicTable(SymbolicTable *table) {
     for (size_t i = 0; i < vector_len(table->symbols); i += 1) {
         SymbolRecord record = table->symbols[i];
@@ -210,4 +122,103 @@ void free_SymbolicTable(SymbolicTable *table) {
 
     free_vector(table->symbols);
     free_vector(table->terminal_values);
+}
+
+int compare_SymbolRecord_id(const void *_a, const void *_b) {
+    const SymbolRecord *a = _a;
+    const SymbolRecord *b = _b;
+
+    return a->id - b->id; 
+}
+
+int compare_SymbolRecord_name(const void *_a, const void *_b) {
+    const SymbolRecord *a = _a;
+    const SymbolRecord *b = _b;
+
+    return strcmp(a->name, b->name); 
+}
+
+int compare_TerminalValueRecord_terminal_id(const void *_a, const void *_b) {
+    const TerminalValueRecord *a = _a;
+    const TerminalValueRecord *b = _b;
+
+    return a->terminal_id - b->terminal_id;
+}
+
+int compare_TerminalValueRecord_value(const void *_a, const void *_b) {
+    const TerminalValueRecord *a = _a;
+    const TerminalValueRecord *b = _b;
+
+    return strcmp(a->value, b->value);
+}
+
+void sort_SybolicTable(SymbolicTable *table) {
+    qsort(table->symbols, vector_len(table->symbols), sizeof(SymbolRecord), compare_SymbolRecord_name);
+    qsort(table->terminal_values, vector_len(table->terminal_values), sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
+};
+
+void unsort_SybolicTable(SymbolicTable *table) {
+    qsort(table->symbols, vector_len(table->symbols), sizeof(SymbolRecord), compare_SymbolRecord_id);
+    qsort(table->terminal_values, vector_len(table->terminal_values), sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
+};
+
+const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id) {
+    size_t symbols_len = vector_len(table->symbols);
+
+    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id); 
+
+    SymbolRecord search_record = { id, EpsillonType, NULL };
+
+    if (is_sorted) {
+        return &table->symbols[id];
+    }
+
+    return _lfind(&search_record, table->symbols, &symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id);
+}
+
+const SymbolRecord *find_symbol_by_name(const SymbolicTable *table, const char *name) {
+    size_t symbols_len = vector_len(table->symbols);
+    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name); 
+    SymbolRecord search_record = { 0, EpsillonType, name };
+
+    if (is_sorted) {
+        return bsearch(&search_record, table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
+    }
+
+    return _lfind(&search_record, table->symbols, &symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
+}
+
+const TerminalValueRecord *find_terminal_by_terminal_id(const SymbolicTable *table, size_t id) {
+    size_t terminal_values_len = vector_len(table->terminal_values);
+    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id); 
+    TerminalValueRecord search_record = { id, NULL };
+
+    if (is_sorted) {
+        return bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
+    }
+
+    return _lfind(&search_record, table->terminal_values, &terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
+}
+
+const SymbolRecord *find_terminal_by_value(const SymbolicTable *table, const char *value) {
+    size_t terminal_values_len = vector_len(table->terminal_values);
+    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value); 
+    TerminalValueRecord search_record = { 0, value };
+
+    if (is_sorted) {
+        const TerminalValueRecord *record = bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
+        if (record == NULL) {
+            return NULL;
+        }
+
+        return find_symbol_by_id(table, record->terminal_id);
+    }
+
+    const TerminalValueRecord *record = _lfind(&search_record, table->terminal_values, &terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
+
+    if (record == NULL) {
+        return NULL;
+    }
+
+    return find_symbol_by_id(table, record->terminal_id);
 }

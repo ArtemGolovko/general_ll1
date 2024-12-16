@@ -11,6 +11,11 @@ typedef enum {
 typedef struct {
     size_t id;
     SymbolType type;
+
+    /**
+    * The underscore character prefix is used to indicate program definied
+    * symbols in symbolic table. It aims to remove chance of name collision
+    */
     char *name;
 } SymbolRecord;
 
@@ -36,7 +41,16 @@ typedef struct {
 SymbolicTable build_SymbolicTable(ASTRules *ast_root);
 void free_SymbolicTable(SymbolicTable *table);
 
+/**
+ * This function sorts symbols in the symbolic table by name and terminals by value.
+ * This allows for faster search by name. However searching by id becomes slower
+ */
 void sort_SybolicTable(SymbolicTable *table);
+
+/**
+ * This function reverts the symbolic table to it's original state.
+ * This allows for instant access by id
+ */
 void unsort_SybolicTable(SymbolicTable *table);
 
 const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id);
