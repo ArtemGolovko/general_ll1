@@ -21,7 +21,8 @@ SymbolicTable build_SymbolicTable(ASTRules *ast_root) {
         1,
         0,
         0,
-        0
+        0,
+        false
     };
 
     SymbolRecord epsillon_record = {
@@ -155,21 +156,24 @@ int compare_TerminalValueRecord_value(const void *_a, const void *_b) {
 void sort_SybolicTable(SymbolicTable *table) {
     qsort(table->symbols, vector_len(table->symbols), sizeof(SymbolRecord), compare_SymbolRecord_name);
     qsort(table->terminal_values, vector_len(table->terminal_values), sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
+
+    table->is_sorted = true;
 };
 
 void unsort_SybolicTable(SymbolicTable *table) {
     qsort(table->symbols, vector_len(table->symbols), sizeof(SymbolRecord), compare_SymbolRecord_id);
     qsort(table->terminal_values, vector_len(table->terminal_values), sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
+
+    table->is_sorted = false;
 };
 
 const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id) {
     size_t symbols_len = vector_len(table->symbols);
 
-    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_id); 
 
     SymbolRecord search_record = { id, EpsillonType, NULL };
 
-    if (is_sorted) {
+    if (table->is_sorted) {
         return &table->symbols[id];
     }
 
@@ -178,10 +182,9 @@ const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id) {
 
 const SymbolRecord *find_symbol_by_name(const SymbolicTable *table, const char *name) {
     size_t symbols_len = vector_len(table->symbols);
-    bool is_sorted = sorted(table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name); 
     SymbolRecord search_record = { 0, EpsillonType, name };
 
-    if (is_sorted) {
+    if (table->is_sorted) {
         return bsearch(&search_record, table->symbols, symbols_len, sizeof(SymbolRecord), compare_SymbolRecord_name);
     }
 
@@ -190,10 +193,9 @@ const SymbolRecord *find_symbol_by_name(const SymbolicTable *table, const char *
 
 const TerminalValueRecord *find_terminal_by_terminal_id(const SymbolicTable *table, size_t id) {
     size_t terminal_values_len = vector_len(table->terminal_values);
-    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id); 
     TerminalValueRecord search_record = { id, NULL };
 
-    if (is_sorted) {
+    if (table->is_sorted) {
         return bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_terminal_id);
     }
 
@@ -202,10 +204,9 @@ const TerminalValueRecord *find_terminal_by_terminal_id(const SymbolicTable *tab
 
 const SymbolRecord *find_terminal_by_value(const SymbolicTable *table, const char *value) {
     size_t terminal_values_len = vector_len(table->terminal_values);
-    bool is_sorted = sorted(table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value); 
     TerminalValueRecord search_record = { 0, value };
 
-    if (is_sorted) {
+    if (table->is_sorted) {
         const TerminalValueRecord *record = bsearch(&search_record, table->terminal_values, terminal_values_len, sizeof(TerminalValueRecord), compare_TerminalValueRecord_value);
         if (record == NULL) {
             return NULL;

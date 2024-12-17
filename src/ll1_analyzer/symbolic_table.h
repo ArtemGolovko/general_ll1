@@ -36,6 +36,9 @@ typedef struct {
     size_t epsillon_id;
     size_t eof_id;
     size_t invalid_id;
+
+    /** invernal */
+    bool is_sorted;
 } SymbolicTable;
 
 SymbolicTable build_SymbolicTable(ASTRules *ast_root);
