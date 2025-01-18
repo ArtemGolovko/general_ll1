@@ -173,7 +173,7 @@ const SymbolRecord *find_symbol_by_id(const SymbolicTable *table, size_t id) {
 
     SymbolRecord search_record = { id, EpsillonType, NULL };
 
-    if (table->is_sorted) {
+    if (!table->is_sorted) {
         return &table->symbols[id];
     }
 
